@@ -56,17 +56,31 @@ defmodule Logos.Interface do
   defmacro fork(do: {:__block__, _, clauses}) do
     quote do
       unquote(clauses)
-      |> Enum.map(&C.all/1)
+      # |> Enum.map(&C.all/1)
+      |> Enum.map(fn
+        clause when is_list(clause) -> C.all(clause)
+        clause -> clause
+      end)
       |> C.any()
     end
   end
 
-  defmacro fork(do: clause) when is_list(clause) do
+  defmacro fork(do: clause) do
     clauses = {:__block__, [], [clause]}
 
     quote do
       Logos.Interface.fork do
         unquote(clauses)
+      end
+    end
+  end
+
+  defmacro defrule({name, _, args}, do: clause_block) do
+    quote do
+      def unquote(name)(unquote_splicing(args)) do
+        fork do
+          unquote(clause_block)
+        end
       end
     end
   end
