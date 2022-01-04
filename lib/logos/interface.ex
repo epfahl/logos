@@ -8,7 +8,7 @@ defmodule Logos.Interface do
   alias Logos.Presentation, as: P
 
   @doc """
-  Inject logical variables into a rule and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
+  Inject logical variables into a relational expression and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
   """
   defmacro with_vars(vars, do: goal) when is_list(vars) do
     goals = List.wrap(goal)
@@ -48,6 +48,10 @@ defmodule Logos.Interface do
 
   @doc """
   Return a goal that is the disjunction over conjunction clauses, where each clause is a list of goals that represents and implicit conjunction.
+
+  Notes
+  * This is a proper rule, but with syntactic sugar.
+    - Perhaps this should be moved to a module with equal, any, all, and other base rules?
   """
   defmacro fork(do: {:__block__, _, clauses}) do
     quote do
