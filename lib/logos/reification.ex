@@ -1,4 +1,4 @@
-defmodule Logos.Reification do
+defmodule Logos.Presentation do
   alias Logos.Variable, as: V
   alias Logos.State, as: S
   alias Logos.Unification, as: U
@@ -7,7 +7,7 @@ defmodule Logos.Reification do
   Deeply traverse the state by walking both variable and lists that may contain variables.
 
   Notes
-  * Probably move to a more general place, since this has use beyond reification, I think.
+  * May move to a more general place, since this has use beyond presentation, I think.
   """
   def walk_deep(%S{} = state, term) do
     wterm = U.walk(state, term)
@@ -36,7 +36,7 @@ defmodule Logos.Reification do
   def create_var_sub(%S{} = state, term), do: do_create_var_sub(state, U.walk(state, term))
 
   defp do_create_var_sub(%S{count: c} = state, %V{} = v) do
-    rvar = presented_var(c)
+    rvar = present_var(c)
     {:ok, state} = S.extend_sub(state, v, rvar)
     %{state | count: c + 1}
   end
@@ -47,5 +47,5 @@ defmodule Logos.Reification do
 
   defp do_create_var_sub(state, _term), do: state
 
-  defp presented_var(n), do: :"_#{n}"
+  defp present_var(n), do: :"_#{n}"
 end

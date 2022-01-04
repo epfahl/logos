@@ -5,10 +5,10 @@ defmodule Logos.Interface do
 
   alias Logos.Core, as: C
   alias Logos.Variable, as: V
-  alias Logos.Reification, as: R
+  alias Logos.Presentation, as: P
 
   @doc """
-  Inject logical variables into a goal and return the resulting goal. If the goal argument is a list of goals, it is treated as an implicit conjunction.
+  Inject logical variables into a rule and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
   """
   defmacro with_vars(vars, do: goal) when is_list(vars) do
     goals = List.wrap(goal)
@@ -30,7 +30,7 @@ defmodule Logos.Interface do
   end
 
   @doc """
-  Pursue variables in a goal by calling the goal on an initially empty state, reifying the result, and returning the result as an Elixir Stream. If the goal argument is a list of goals, it is treated as an implicit conjunction.
+  Execute a query for a list of requested variables by calling the provided goal with an empty state. The results are provided as an Elixir stream. If `ask` is given a list of goals, it is treated as an implicit conjunction.
   """
   defmacro ask(vars, do: goal) when is_list(vars) do
     goals = List.wrap(goal)
@@ -42,7 +42,7 @@ defmodule Logos.Interface do
         [C.equal(out, unquote(vars)) | unquote(goals)]
       end
       |> C.call_on_empty()
-      |> Stream.map(&R.present(out).(&1))
+      |> Stream.map(&P.present(out).(&1))
     end
   end
 

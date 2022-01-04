@@ -10,7 +10,7 @@ Key motivations:
   * More approachable to someone who has never been exposed to miniKanren or Prolog, but is familiar with Elixir pattern matching.
   * Names that are more self-describing, more grammatically consistent, and hopefully more memorable.
   * Explicit and consistent syntactic conventions.
-* A native Elixir implementation.
+* A hosted, idiomatic Elixir implementation.
   * Elixir's use of module namespaces means that naming conflicts can often be avoided, allowing for better function names.
   * When parallelization is an option, Elixir makes this straightforward.
 * Expose and explain Elixir's logical roots.
@@ -18,6 +18,7 @@ Key motivations:
   * Only list data structure (no maps or tuples).
   * Only `choice` as non-relational rule.
 * A well-organized code base that facilitates exploration, extension, and custom usage patterns.
+* The paradigm of relational programming is generally interesting and still relevant.
 
 ### A sample of references that influenced this work
 
@@ -90,6 +91,29 @@ The result is an empty stream, meaning that there is no state for which the goal
 <!-- livebook:{"break_markdown":true} -->
 
 Several specialized words are used above and in what follows, and it's important to have some early appreciation of their meanings. In `Logos`, the equivalence _rule_ is expressed as `equal(x, y)`, where `x`and `y` are any two _terms_. A _term_ can be a variable or a constant (number, string, or atom), or a list of variables and constants. A _rule_ expresses a logical relationship among terms. When `x` is a variable and `y` is set to the constant 1, `equal(x, 1)` is a logical _goal_ asserting that the variable `x` is equal to 1. When a goal is wrapped with `ask`, that goal is posed as a _query_ against any data already captured in the running program. The definitions of _rule_, _goal_, and _query_ will be further explored when we discuss the implementation of `Logos`.
+
+<!-- livebook:{"break_markdown":true} -->
+
+To show that `equal` works for list terms, find `x` and `y` in the following query:
+
+```elixir
+ask [x, y] do
+  equal([x, 2, 3], [1, 2, y])
+end
+|> Enum.to_list()
+```
+
+Because the algorithm that performs this matching is recursive, list terms with any depth can be used:
+
+```elixir
+ask [x, y] do
+  equal(
+    [1, [2, [x, y]]],
+    [1, [2, [3, [4, 5]]]]
+  )
+end
+|> Enum.to_list()
+```
 
 ## A stream of answers
 
@@ -179,4 +203,4 @@ end
 
 ## What's next?
 
-
+_Coming soon._
