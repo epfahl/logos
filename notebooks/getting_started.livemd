@@ -146,14 +146,16 @@ end
 |> Enum.to_list()
 ```
 
-`Logos` allows implicit conjunctions in `ask`, where a list of goals `[g1, g2, ...]` is interpreted as `all([g1, g2, ...])`, so that the above query can be written as
+`Logos` allows implicit conjunctions in `ask`, where a list of goals `[g1, g2, ...]` is interpreted as `all([g1, g2, ...])`, so that the above query can be simplified to
 
 ```elixir
-ask [x, y] do
-  [
-    equal(x, y),
-    equal(y, 1)
-  ]
+ask [x] do
+  with_vars [y] do
+    [
+      equal(x, y),
+      equal(y, 1)
+    ]
+  end
 end
 |> Enum.to_list()
 ```
@@ -199,6 +201,18 @@ ask [x, y] do
   end
 end
 |> Enum.to_list()
+```
+
+`Logos` goes one step further by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+ask [x, y] do
+    [equal(x, "a"), equal(y, 1)]
+    [equal(x, "b"), equal(y, 2)]
+    [equal(x, "c"), equal(y, 3)]
+end
 ```
 
 ## What's next?
