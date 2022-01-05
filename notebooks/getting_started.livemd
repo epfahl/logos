@@ -68,7 +68,7 @@ ask [x] do
 end
 ```
 
-In words, this could be read as, "Ask for `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
+In words, this could be read as, "Ask for the value of `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
 
 ```elixir
 ask [x] do
