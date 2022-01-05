@@ -68,7 +68,7 @@ ask [x] do
 end
 ```
 
-The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
+In words, this could be read as, "Ask for `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
 
 ```elixir
 ask [x] do
@@ -90,7 +90,7 @@ The result is an empty stream, meaning that there is no state for which the goal
 
 <!-- livebook:{"break_markdown":true} -->
 
-Several specialized words are used above and in what follows, and it's important to have some early appreciation of their meanings. In `Logos`, the equivalence _rule_ is expressed as `equal(x, y)`, where `x`and `y` are any two _terms_. A _term_ can be a variable or a constant (number, string, or atom), or a list of variables and constants. A _rule_ expresses a logical relationship among terms. When `x` is a variable and `y` is set to the constant 1, `equal(x, 1)` is a logical _goal_ asserting that the variable `x` is equal to 1. When a goal is wrapped with `ask`, that goal is posed as a _query_ against any data already captured in the running program. The definitions of _rule_, _goal_, and _query_ will be further explored when we discuss the implementation of `Logos`.
+Several specialized words are used above and in what follows, and it's important to have some early appreciation of their meanings. A _rule_ expresses a logical relationship among _terms_. A _term_ can be a variable or a constant (number, string, or atom), or a list of variables and constants. The equivalence _rule_ is expressed as `equal(x, y)`, where `x`and `y` are any two _terms_. When `x` is a variable and `y` is set to the constant 1, `equal(x, 1)` is a logical _goal_ asserting that the variable `x` is equal to 1. When a goal is wrapped with `ask`, that goal is posed as a _query_ for we'd like answer.
 
 <!-- livebook:{"break_markdown":true} -->
 
