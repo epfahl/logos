@@ -2,23 +2,23 @@
 
 ## What is Logos?
 
-... What is this thing? Why is this thing? ... WIP ...
+**Logos: A Greek word (λόγοϚ) from which the word _logic_ is derived.**
 
-Key motivations:
+`Logos` is a small logic (aka _relational_) programming language adapted from miniKanren and µKanren. An attempt was made to create an interface that looks like idiomatic Elixir and feels approachable to someone who has no experience with relational programming beyond Elixir pattern matching. Many of the core concepts and implementation details were adopted directly from the book, _The Reasoned Schemer_, and the µKanren paper (see references below). However, many function names have been updated, either to be more descriptive and memmorable, or due to Elixir conventions. Also, to enhance the user experience in Elixir, some of the relational primitives in `Logos` differ in structure from their counterparts in miniKanren.
 
-* Attempt to create a more accessible miniKanren implementation, while preserving the core approaches in micro/miniKanren.
-  * More approachable to someone who has never been exposed to miniKanren or Prolog, but is familiar with Elixir pattern matching.
-  * Names that are more self-describing, more grammatically consistent, and hopefully more memorable.
-  * Explicit and consistent syntactic conventions.
-* A hosted, idiomatic Elixir implementation.
-  * Elixir's use of module namespaces means that naming conflicts can often be avoided, allowing for better function names.
-  * When parallelization is an option, Elixir makes this straightforward.
-* Expose and explain Elixir's logical roots.
-* Focus on a well-designed, minimal base implementation that can be used immediate to support several meaningful use cases.
-  * Only list data structure (no maps or tuples).
-  * Only `choice` as non-relational rule.
-* A well-organized code base that facilitates exploration, extension, and custom usage patterns.
-* The paradigm of relational programming is generally interesting and still relevant.
+This library grew out of a general interest in logic programming and its potential applications to software-based products. Because usage and extension of `Logos` are key design considerations, the library is broken into modules that reflect the different implementation concerns, including unification, a purely functional core reminiscent of µKanren, and a collection of macros that make up the main user interface. It is hoped that `Logos` can be applied, adapted, and grown with relative ease. Documentation for each of the modules, functions, and macros is extensive, and includes many usage examples, as well as notes on specific design choices and possible areas for future improvement (**WIP note: This is not yet true, but it will be!**).
+
+### Questions (WIP)
+
+_Why now?_
+
+_Why Elixir_
+
+_What's different?_
+
+_What's new?_
+
+_What are the applications?_
 
 ### A sample of references that influenced this work
 
@@ -217,4 +217,4 @@ end
 
 ## What's next?
 
-_Coming soon._
+WIP
