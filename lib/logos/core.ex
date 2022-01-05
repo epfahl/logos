@@ -68,17 +68,17 @@ defmodule Logos.Core do
   @doc """
   Non-relational if-then-else goal.
   """
-  def branch(g_if, g_then, g_else) do
+  def switch(g_if, g_then, g_else) do
     fn %S{} = state ->
-      do_branch(state, g_if.(state), g_then, g_else)
+      do_switch(state, g_if.(state), g_then, g_else)
     end
   end
 
-  defp do_branch(_state, [_h | _t] = stream, g_then, _g_else), do: D.flat_map(stream, g_then)
-  defp do_branch(state, [], _g_then, g_else), do: g_else.(state)
+  defp do_switch(_state, [_h | _t] = stream, g_then, _g_else), do: D.flat_map(stream, g_then)
+  defp do_switch(state, [], _g_then, g_else), do: g_else.(state)
 
-  defp do_branch(state, stream, g_then, g_else) when is_function(stream),
-    do: fn -> do_branch(state, stream.(), g_then, g_else) end
+  defp do_switch(state, stream, g_then, g_else) when is_function(stream),
+    do: fn -> do_switch(state, stream.(), g_then, g_else) end
 
   @doc """
   Return a goal that wraps the given goal in a thunk.
