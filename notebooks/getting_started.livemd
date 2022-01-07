@@ -4,7 +4,7 @@
 
 **Logos: A Greek word (λόγοϚ) from which the word _logic_ is derived.**
 
-`Logos` is a small logic (aka _relational_) programming language adapted from miniKanren and µKanren. An attempt was made to create an interface that looks like idiomatic Elixir and feels approachable to someone who has no experience with relational programming beyond Elixir pattern matching. Many of the core concepts and implementation details were adopted directly from the book, _The Reasoned Schemer_, and the µKanren paper (see references below). However, many function names have been updated, either to be more descriptive and memorable, or due to Elixir conventions. Also, to enhance the user experience in Elixir, some of the relational primitives in `Logos` differ in structure from their counterparts in miniKanren.
+`Logos` is a relatively small Elixir-hosted logic (aka _relational_) programming language adapted from miniKanren and µKanren. An attempt was made to create an interface that looks like idiomatic Elixir and feels approachable to someone who has no experience with relational programming beyond Elixir pattern matching. Many of the core concepts and implementation details were adopted directly from the book, _The Reasoned Schemer_, and the µKanren paper (see references below). However, many function names have been updated, either to be more descriptive and memorable, or due to Elixir conventions. Also, to enhance the user experience in Elixir, some of the relational primitives in `Logos` differ in structure from their counterparts in miniKanren.
 
 This library grew out of a general interest in logic programming and its potential applications to software-based products. Because usage and extension of `Logos` are key design considerations, the library is broken into modules that reflect the different implementation concerns, including unification, a purely functional core reminiscent of µKanren, and a collection of macros that make up the main user interface. It is hoped that `Logos` can be applied, adapted, and grown with relative ease. Documentation for each of the modules, functions, and macros is extensive, and includes many usage examples, as well as notes on specific design choices and possible areas for future improvement (**WIP note: This is not yet true, but it will be!**).
 
@@ -56,7 +56,7 @@ import Logos.Interface, only: [ask: 2, fork: 1, with_vars: 2]
 import Logos.Rule
 ```
 
-and brings in a set of common logical rules as well as the macros `ask`, `with_vars`, and `fork`. Now that the basic functionality is accessible, let's see `Logos` in action with several small examples.
+This brings in a set of common logical rules as well as the macros `ask`, `with_vars`, and `fork`. Now that the basic functionality is accessible, let's see `Logos` in action with several small examples.
 
 ## Ask a question
 
@@ -125,7 +125,7 @@ Just like in algebra, a query in `Logos` can have more than one answer--possibly
 ask [l] do
   member(:item, l)
 end
-|> Enum.take(20)
+|> Enum.take(10)
 ```
 
 Intuitively, it's apparent that there is an infinite collection of lists that satisfy this query--lists of all possible lengths where `:item` is in any available position. The result above shows 10 such lists from the infinite stream. Other values in the lists of the form `:_<integer>` are variable slots that are not constrained by the query and can hold any value.
@@ -192,7 +192,7 @@ end
 |> Enum.to_list()
 ```
 
-Queries like this--a dijunction of conjunctions--are common in logic programming. `Logos` offers the macro `fork` to reduce the syntactic load of these expressions:
+Queries like this--a disjunction of conjunctions--are common in logic programming. `Logos` offers the macro `fork` to reduce the syntactic load of these expressions:
 
 ```elixir
 ask [x, y] do
@@ -205,7 +205,7 @@ end
 |> Enum.to_list()
 ```
 
-`Logos` goes one step further with syntactic suger by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
+`Logos` goes one step further with syntactic sugar by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
 
 ```elixir
 ask [x, y] do
@@ -229,6 +229,6 @@ end
 |> Enum.to_list()
 ```
 
-## What's next?
+## Where to go from here?
 
-WIP
+TB
