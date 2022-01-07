@@ -63,10 +63,10 @@ ask [x] do
   equal(x, 1)
 end
 
-> #Stream<[
-    enum: #Function<51.58486609/2 in Stream.resource/3>,
-    funs: [#Function<47.58486609/1 in Stream.map/2>]
-  ]>
+#Stream<[
+  enum: #Function<51.58486609/2 in Stream.resource/3>,
+  funs: [#Function<47.58486609/1 in Stream.map/2>]
+]>
 ```
 
 In words, this code could be read as, "Ask for the value of `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
@@ -77,7 +77,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> [[1]]
+[[1]]
 ```
 
 When `Logos` evaluates a query, an attempt is made to satisfy the goal. However, it may be that the goal expresses a false relationship, as shown here:
@@ -88,7 +88,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> []
+[]
 ```
 
 The result is an empty stream, meaning that there is no state for which the goal is true.
@@ -103,7 +103,7 @@ ask [x, y] do
 end
 |> Enum.to_list()
 
-> [[1, 3]]
+[[1, 3]]
 ```
 
 Because the algorithm that performs this matching is recursive, list terms with any depth can be used:
@@ -117,7 +117,7 @@ ask [x, y] do
 end
 |> Enum.to_list()
 
-> [[3, [4, 5]]]
+[[3, [4, 5]]]
 ```
 
 Here the value of `x` is 3, and `y` is the list `[4, 5]`.
@@ -132,19 +132,18 @@ ask [l] do
 end
 |> Enum.take(20)
 
-> [
-    [[:item]],
-    [[:item, :_0]],
-    [[:item, :_0, :_1]],
-    [[:_0, :item]],
-    [[:item, :_0, :_1, :_2]],
-    [[:item, :_0, :_1, :_2, :_3]],
-    [[:_0, :item, :_1]],
-    [[:item, :_0, :_1, :_2, :_3, :_4]],
-    [[:item, :_0, :_1, :_2, :_3, :_4, :_5]],
-    [[:_0, :item, :_1, :_2]]
-  ]
-
+[
+  [[:item]],
+  [[:item, :_0]],
+  [[:item, :_0, :_1]],
+  [[:_0, :item]],
+  [[:item, :_0, :_1, :_2]],
+  [[:item, :_0, :_1, :_2, :_3]],
+  [[:_0, :item, :_1]],
+  [[:item, :_0, :_1, :_2, :_3, :_4]],
+  [[:item, :_0, :_1, :_2, :_3, :_4, :_5]],
+  [[:_0, :item, :_1, :_2]]
+]
 ```
 
 Intuitively, it's apparent that there is an infinite collection of lists that satisfy this query--lists of all possible lengths where `:item` is in any available position. The result above shows 10 such lists from the infinite stream. Other values in the lists of the form `:_<integer>` are variable slots that are not constrained by the query and can hold any value.
@@ -166,7 +165,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> [[1]]
+[[1]]
 ```
 
 `Logos` allows implicit conjunctions in `ask`, where a list of goals `[g1, g2, ...]` is interpreted as `all([g1, g2, ...])`, so that the above query can be simplified to
@@ -182,7 +181,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> [[1]]
+[[1]]
 ```
 
 Another simple question and corresponding `Logos` query demonstrate the use of `any`: _If `x` can equal "a" or "b" or "c", what are the values of `x`?_
@@ -197,7 +196,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> [["a"], ["b"], ["c"]]
+[["a"], ["b"], ["c"]]
 ```
 
 As expected, the result has 3 possible solution states. Notice that `any([...])` in the above query could be replaced with `member(x, ["a", "b", "c"])`.
@@ -214,7 +213,7 @@ ask [x, y] do
 end
 |> Enum.to_list()
 
-> [["a", 1], ["b", 2], ["c", 3]]
+[["a", 1], ["b", 2], ["c", 3]]
 ```
 
 Queries like this--a disjunction of conjunctions--are common in logic programming. `Logos` offers the macro `fork` to reduce the syntactic load of these expressions:
@@ -229,7 +228,7 @@ ask [x, y] do
 end
 |> Enum.to_list()
 
-> [["a", 1], ["b", 2], ["c", 3]]
+[["a", 1], ["b", 2], ["c", 3]]
 ```
 
 `Logos` goes one step further with syntactic sugar by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
@@ -242,7 +241,7 @@ ask [x, y] do
 end
 |> Enum.to_list()
 
-> [["a", 1], ["b", 2], ["c", 3]]
+[["a", 1], ["b", 2], ["c", 3]]
 ```
 
 When a conjunction clause has only one item, the list may be omitted:
@@ -257,7 +256,7 @@ ask [x] do
 end
 |> Enum.to_list()
 
-> [[1], [2]]
+[[1], [2]]
 ```
 
 # Where to go from here?
