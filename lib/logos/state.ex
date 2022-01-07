@@ -1,6 +1,8 @@
 defmodule Logos.State do
   @moduledoc """
-  The state holds a counter for the number of created logical variables, and a map from varialbes to their subitution values. All low-level interactions with a state take place through the functions in this module.
+  Defines the struct for holding variable bindings, along with functions for interacting with the state.
+
+  The state holds a counter for the number of created logical variables, and a map from variables to their subitution values. All low-level interactions with a state take place through the functions in this module.
   """
   alias __MODULE__, as: S
 

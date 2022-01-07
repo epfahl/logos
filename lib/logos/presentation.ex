@@ -1,4 +1,8 @@
 defmodule Logos.Presentation do
+  @moduledoc """
+  Functions for creating the presentation of the results of an executed logic program.
+  """
+
   alias Logos.Variable, as: V
   alias Logos.State, as: S
   alias Logos.Unification, as: U

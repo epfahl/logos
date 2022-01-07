@@ -66,6 +66,20 @@ defmodule Logos.Core do
   end
 
   @doc """
+  Return a goal that wraps the given goal in a thunk.
+  """
+  def delay(goal) do
+    fn %S{} = state ->
+      fn -> goal.(state) end
+    end
+  end
+
+  @doc """
+  Call a goal on an empty state and return the result as an Elixir Stream.
+  """
+  def call_on_empty(goal), do: goal.(S.empty()) |> D.to_stream()
+
+  @doc """
   Non-relational if-then-else goal.
   """
   def switch(g_if, g_then, g_else) do
@@ -79,18 +93,4 @@ defmodule Logos.Core do
 
   defp do_switch(state, stream, g_then, g_else) when is_function(stream),
     do: fn -> do_switch(state, stream.(), g_then, g_else) end
-
-  @doc """
-  Return a goal that wraps the given goal in a thunk.
-  """
-  def delay(goal) do
-    fn %S{} = state ->
-      fn -> goal.(state) end
-    end
-  end
-
-  @doc """
-  Call a goal on an empty state and return the result as an Elixir Stream.
-  """
-  def call_on_empty(goal), do: goal.(S.empty()) |> D.to_stream()
 end

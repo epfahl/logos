@@ -1,4 +1,8 @@
 defmodule Logos.Unification do
+  @moduledoc """
+  Defines `unify`, the core algorithm for manipulating bindings of logical variables.
+  """
+
   alias Logos.Variable, as: V
   alias Logos.State, as: S
 

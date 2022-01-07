@@ -1,5 +1,6 @@
 defmodule Logos.DelayedList do
   @moduledoc """
+  Functions needed for interacting with a delayed list--a custom stream implementation.
   """
 
   @doc """

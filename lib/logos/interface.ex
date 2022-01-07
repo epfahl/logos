@@ -1,6 +1,6 @@
 defmodule Logos.Interface do
   @moduledoc """
-
+  A set of macros that define the main public interface for `Logos`.
   """
 
   alias Logos.Core, as: C

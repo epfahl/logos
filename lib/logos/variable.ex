@@ -1,4 +1,8 @@
 defmodule Logos.Variable do
+  @moduledoc """
+  Defines the struct for a logical variable.
+  """
+
   defstruct [:id]
 
   @doc """
