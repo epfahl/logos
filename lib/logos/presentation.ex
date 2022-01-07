@@ -4,7 +4,7 @@ defmodule Logos.Presentation do
   alias Logos.Unification, as: U
 
   @doc """
-  Deeply traverse the state by walking both variable and lists that may contain variables.
+  Deeply traverse the state by walking both variables and lists that may contain variables.
 
   Notes
   * May move to a more general place, since this has use beyond presentation, I think.
