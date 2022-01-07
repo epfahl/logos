@@ -1,6 +1,6 @@
 # What is Logos?
 
-**Logos: A Greek word (λόγοϚ) from which the word _logic_ is derived.**
+**Logos: **Logos: The Greek root (λόγοϚ) of the word _logic_.**
 
 `Logos` is a relatively small Elixir-hosted logic (aka _relational_) programming language adapted from miniKanren and µKanren. An attempt was made to create an interface that looks like idiomatic Elixir and feels approachable to someone who has no experience with relational programming beyond Elixir pattern matching. Many of the core concepts and implementation details were adopted directly from the book, _The Reasoned Schemer_, and the µKanren paper (see references below). However, many function names have been updated, either to be more descriptive and memorable, or due to Elixir conventions. Also, to enhance the user experience in Elixir, some of the relational primitives in `Logos` differ in structure from their counterparts in miniKanren.
 
