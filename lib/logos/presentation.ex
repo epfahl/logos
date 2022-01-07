@@ -14,8 +14,8 @@ defmodule Logos.Presentation do
     do_walk_deep(state, wterm)
   end
 
-  def do_walk_deep(state, [h | t]), do: [walk_deep(state, h) | walk_deep(state, t)]
-  def do_walk_deep(_state, term), do: term
+  defp do_walk_deep(state, [h | t]), do: [walk_deep(state, h) | walk_deep(state, t)]
+  defp do_walk_deep(_state, term), do: term
 
   @doc """
   Present a term by finding its most grounded value in a state and, if the value is a variable, creating an abstract representation.
