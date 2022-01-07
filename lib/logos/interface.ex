@@ -11,10 +11,10 @@ defmodule Logos.Interface do
   Return a goal that is the disjunction over conjunction clauses, where each clause is a list of goals that represents and implicit conjunction.
   """
   defmacro fork(do: clause_block) do
-    clauses = to_clauses(clause_block)
+    any_clauses = to_any_clauses(clause_block)
 
     quote do
-      unquote(clauses)
+      unquote(any_clauses)
       |> Enum.map(fn
         clause when is_list(clause) -> C.all(clause)
         clause -> clause
@@ -23,9 +23,9 @@ defmodule Logos.Interface do
     end
   end
 
-  # Get the list of clauses from the code block with zero or more `any` clauses
-  defp to_clauses({:__block__, _, clauses}), do: clauses
-  defp to_clauses(clause), do: [clause]
+  # Get the list of zero or more `any` clauses from the code block with 0 or more elements
+  defp to_any_clauses({:__block__, _, clauses}), do: clauses
+  defp to_any_clauses(clause), do: [clause]
 
   @doc """
   Inject logical variables into a relational expression and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
