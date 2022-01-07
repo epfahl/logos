@@ -10,8 +10,8 @@ defmodule Logos.Interface do
   @doc """
   Return a goal that is the disjunction over conjunction clauses, where each clause is a list of goals that represents and implicit conjunction.
   """
-  defmacro fork(do: clause_block) do
-    any_clauses = to_any_clauses(clause_block)
+  defmacro fork(do: any_clause_block) do
+    any_clauses = to_any_clauses(any_clause_block)
 
     quote do
       unquote(any_clauses)
@@ -30,20 +30,20 @@ defmodule Logos.Interface do
   @doc """
   Inject logical variables into a relational expression and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
   """
-  defmacro with_vars([h | t], do: clause_block) do
+  defmacro with_vars([h | t], do: any_clause_block) do
     quote do
       C.with_var(fn unquote(h) ->
         Logos.Interface.with_vars unquote(t) do
-          unquote(clause_block)
+          unquote(any_clause_block)
         end
       end)
     end
   end
 
-  defmacro with_vars([], do: clause_block) do
+  defmacro with_vars([], do: any_clause_block) do
     quote do
       Logos.Interface.fork do
-        unquote(clause_block)
+        unquote(any_clause_block)
       end
     end
   end
@@ -51,7 +51,7 @@ defmodule Logos.Interface do
   @doc """
   Execute a query for a list of requested variables by calling the provided goal with an empty state. The results are provided as an Elixir stream. If `ask` is given a list of goals, it is treated as an implicit conjunction.
   """
-  defmacro ask(vars, do: clause_block) when is_list(vars) do
+  defmacro ask(vars, do: any_clause_block) when is_list(vars) do
     quote do
       out = V.new(:out)
 
@@ -59,7 +59,7 @@ defmodule Logos.Interface do
         [
           C.equal(out, unquote(vars)),
           Logos.Interface.fork do
-            unquote(clause_block)
+            unquote(any_clause_block)
           end
         ]
       end
@@ -68,11 +68,11 @@ defmodule Logos.Interface do
     end
   end
 
-  defmacro defrule({name, _, args}, do: clause_block) do
+  defmacro defrule({name, _, args}, do: any_clause_block) do
     quote do
       def unquote(name)(unquote_splicing(args)) do
         Logos.Interface.fork do
-          unquote(clause_block)
+          unquote(any_clause_block)
         end
       end
     end
