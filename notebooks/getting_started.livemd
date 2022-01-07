@@ -60,7 +60,7 @@ and brings in a set of common logical rules as well as the macros `ask`, `with_v
 
 ## Ask a question
 
-To get acclimated to the usage of `Logos`, start with a simple algebra question: _What is the value of the variable `x` when `x` is equal to 1?_ This isn't a trick; the answer, `x = 1`, is in the phrasing of the question. But this trifling example will help exhibit the usage of `Logos`. In `Logos`, this question is expressed as
+To get acclimated to the usage of `Logos`, start with a simple algebra question: _What is the value of the variable `x` when `x` is equal to 1?_ This isn't a trick; the answer, `x = 1`, is in the phrasing of the question. In `Logos`, this question is expressed as
 
 ```elixir
 ask [x] do
@@ -68,7 +68,7 @@ ask [x] do
 end
 ```
 
-In words, this could be read as, "Ask for the value of `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
+In words, this code could be read as, "Ask for the value of `x` when `x` equals 1." The macro `ask` takes a list of variables as its argument, a logical _goal_ as a body, and returns an Elixir `Stream`. Each item in the stream is a list of values of the variables passed to `ask` (`x` in the above example). To get a list of results, pipe the stream into `Enum.to_list`:
 
 ```elixir
 ask [x] do
@@ -115,6 +115,8 @@ end
 |> Enum.to_list()
 ```
 
+Here the value of `x` is 3, and `y` is the list `[4, 5]`.
+
 ## A stream of answers
 
 Just like in algebra, a query in `Logos` can have more than one answer--possibly an _infinite_ number. This is why `ask` returns a stream. An open-ended question shows the need for a stream: _What are the lists for which the value `:item` is a member?_ The builtin `Logos` rule `member(item, list)` can be used to ask this question:
@@ -128,7 +130,7 @@ end
 
 Intuitively, it's apparent that there is an infinite collection of lists that satisfy this query--lists of all possible lengths where `:item` is in any available position. The result above shows 10 such lists from the infinite stream. Other values in the lists of the form `:_<integer>` are variable slots that are not constrained by the query and can hold any value.
 
-## Blending rules
+## Blending and sugaring rules
 
 More interesting programs can be built by combining simple rules. The two mechanisms used to combine rules are _disjunction_ ("or" logic) and _conjunction_ ("and" logic). In `Logos`, the two corresponding rules are `any` and `all`, both of which take a list of zero or more goals as arguments.
 
@@ -203,16 +205,28 @@ end
 |> Enum.to_list()
 ```
 
-`Logos` goes one step further by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
-
-<!-- livebook:{"force_markdown":true} -->
+`Logos` goes one step further with syntactic suger by making the `fork` syntax available in both `ask` and `with_vars`. The above query can be written more simply as
 
 ```elixir
 ask [x, y] do
-    [equal(x, "a"), equal(y, 1)]
-    [equal(x, "b"), equal(y, 2)]
-    [equal(x, "c"), equal(y, 3)]
+  [equal(x, "a"), equal(y, 1)]
+  [equal(x, "b"), equal(y, 2)]
+  [equal(x, "c"), equal(y, 3)]
 end
+|> Enum.to_list()
+```
+
+When a conjunction clause has only one item, the list may be omitted:
+
+```elixir
+ask [x] do
+  equal(x, 1)
+
+  with_vars [y] do
+    [equal(x, y), equal(y, 2)]
+  end
+end
+|> Enum.to_list()
 ```
 
 ## What's next?
