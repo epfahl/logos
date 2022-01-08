@@ -82,9 +82,9 @@ defmodule Logos.Core do
   @doc """
   Non-relational if-then-else goal.
   """
-  def switch(g_if, g_then, g_else) do
+  def switch(g_cond, g_then, g_else) do
     fn %S{} = state ->
-      do_switch(state, g_if.(state), g_then, g_else)
+      do_switch(state, g_cond.(state), g_then, g_else)
     end
   end
 

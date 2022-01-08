@@ -6,15 +6,16 @@ defmodule Logos.Interface do
   alias Logos.Core, as: C
   alias Logos.Variable, as: V
   alias Logos.Presentation, as: P
+  alias Logos.Interface, as: I
 
   @doc """
   Return a goal that is the disjunction over conjunction clauses, where each clause is a list of goals that represents and implicit conjunction.
   """
-  defmacro fork(do: any_clause_block) do
-    any_clauses = to_any_clauses(any_clause_block)
+  defmacro fork(do: clause_block) do
+    clauses = fork_clauses(clause_block)
 
     quote do
-      unquote(any_clauses)
+      unquote(clauses)
       |> Enum.map(fn
         clause when is_list(clause) -> C.all(clause)
         clause -> clause
@@ -24,16 +25,16 @@ defmodule Logos.Interface do
   end
 
   # Get the list of zero or more `any` clauses from the code block with 0 or more elements
-  defp to_any_clauses({:__block__, _, clauses}), do: clauses
-  defp to_any_clauses(clause), do: [clause]
+  defp fork_clauses({:__block__, _, clauses}), do: clauses
+  defp fork_clauses(clause), do: [clause]
 
   @doc """
   Inject logical variables into a relational expression and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
   """
-  defmacro with_vars([h | t], do: any_clause_block) do
+  defmacro with_vars([var | t], do: any_clause_block) do
     quote do
-      C.with_var(fn unquote(h) ->
-        Logos.Interface.with_vars unquote(t) do
+      C.with_var(fn unquote(var) ->
+        I.with_vars unquote(t) do
           unquote(any_clause_block)
         end
       end)
@@ -42,7 +43,7 @@ defmodule Logos.Interface do
 
   defmacro with_vars([], do: any_clause_block) do
     quote do
-      Logos.Interface.fork do
+      I.fork do
         unquote(any_clause_block)
       end
     end
@@ -58,7 +59,7 @@ defmodule Logos.Interface do
       Logos.Interface.with_vars unquote(vars) do
         [
           C.equal(out, unquote(vars)),
-          Logos.Interface.fork do
+          I.fork do
             unquote(any_clause_block)
           end
         ]
@@ -68,13 +69,40 @@ defmodule Logos.Interface do
     end
   end
 
+  @doc """
+  Define a named logical rule.
+  """
   defmacro defrule({name, _, args}, do: any_clause_block) do
     quote do
       def unquote(name)(unquote_splicing(args)) do
-        Logos.Interface.fork do
+        I.fork do
           unquote(any_clause_block)
         end
       end
     end
   end
+
+  @doc """
+
+  Notes
+  * `switch` is a normal function and can't parse an implicit conjunction.
+  * Generalize this to work with any kind of right-hand goal, and implicit conjunctions on the left?
+  """
+  defmacro choice(do: [choice_clause]) do
+    [g_cond, g_then] = choice_goals(choice_clause)
+
+    quote do
+      C.all([unquote(g_cond), unquote(g_then)])
+    end
+  end
+
+  defmacro choice(do: [choice_clause | t]) do
+    [g_cond, g_then] = choice_goals(choice_clause)
+
+    quote do
+      C.switch(unquote(g_cond), unquote(g_then), I.choice(do: unquote(t)))
+    end
+  end
+
+  defp choice_goals({:->, _, [[g_cond], g_then]}), do: [g_cond, g_then]
 end
