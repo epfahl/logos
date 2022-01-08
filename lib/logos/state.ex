@@ -39,4 +39,28 @@ defmodule Logos.State do
   Increment the variable count in the state.
   """
   def inc_count(%S{count: c} = state), do: %{state | count: c + 1}
+
+  @doc """
+  Retrieve the value associated with a term by traversing the relationships between variables in the state, and stopping when the value is a list or constant.
+  """
+  def walk(%S{} = state, term) do
+    case fetch(state, term) do
+      {:ok, t} -> walk(state, t)
+      :error -> term
+    end
+  end
+
+  @doc """
+  Deeply traverse the state by walking both variables and lists that may contain variables.
+
+  Notes
+  * May move to a more general place, since this has use beyond presentation, I think.
+  """
+  def walk_deep(%S{} = state, term) do
+    wterm = walk(state, term)
+    do_walk_deep(state, wterm)
+  end
+
+  defp do_walk_deep(state, [h | t]), do: [walk_deep(state, h) | walk_deep(state, t)]
+  defp do_walk_deep(_state, term), do: term
 end

@@ -6,22 +6,22 @@ defmodule Logos.Unification do
   alias Logos.Variable, as: V
   alias Logos.State, as: S
 
-  @doc """
-  Retrieve the value associated with a term by traversing the relationships between variables in the state, and stopping when the value is a list or constant.
-  """
-  def walk(%S{} = state, term) do
-    case S.fetch(state, term) do
-      {:ok, t} -> walk(state, t)
-      :error -> term
-    end
-  end
+  # @doc """
+  # Retrieve the value associated with a term by traversing the relationships between variables in the state, and stopping when the value is a list or constant.
+  # """
+  # def walk(%S{} = state, term) do
+  #   case S.fetch(state, term) do
+  #     {:ok, t} -> walk(state, t)
+  #     :error -> term
+  #   end
+  # end
 
   @doc """
   Attempt to unify a pair of terms in the given state. This returns either `{:ok, <updated state>}` or `{:error, message}` if the terms cannot be unified.
   """
   def unify(%S{} = state, term1, term2) do
-    wterm1 = walk(state, term1)
-    wterm2 = walk(state, term2)
+    wterm1 = S.walk(state, term1)
+    wterm2 = S.walk(state, term2)
     do_unify(state, wterm1, wterm2)
   end
 
