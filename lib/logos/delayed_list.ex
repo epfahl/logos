@@ -1,6 +1,6 @@
 defmodule Logos.DelayedList do
   @moduledoc """
-  Functions needed for interacting with a delayed list--a custom stream implementation.
+  Functions needed for interacting with a delayed list--a custom stream-like implementation that largely mirrors what is used in miniKanren and µKanren.
   """
 
   @doc """
@@ -16,7 +16,7 @@ defmodule Logos.DelayedList do
   @doc """
   Interleave a pair of delayed lists.
 
-  This is effectively `mplus` in muKanren.
+  This is effectively `mplus` in µKanren.
   """
   def interleave(dl1, dl2)
   def interleave([], dl2), do: dl2
