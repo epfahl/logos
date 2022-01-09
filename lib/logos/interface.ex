@@ -112,6 +112,6 @@ defmodule Logos.Interface do
     end
   end
 
-  # Extract the condition and consequence goals from a line in the choice macro
+  # Extract the condition and consequence goals from a quoted line in the choice macro
   defp choice_goals({:->, _, [[g_cond], g_cnsq]}), do: [g_cond, g_cnsq]
 end
