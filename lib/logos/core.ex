@@ -25,7 +25,7 @@ defmodule Logos.Core do
     fn %S{} = state ->
       case U.unify(state, term1, term2) do
         {:ok, s} -> D.single(s)
-        {:error, _} -> D.empty()
+        :error -> D.empty()
       end
     end
   end

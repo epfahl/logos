@@ -32,11 +32,11 @@ defmodule Logos.Unification do
   defp do_unify(state, [h1 | t1], [h2 | t2]) do
     case unify(state, h1, h2) do
       {:ok, s} -> unify(s, t1, t2)
-      {:error, m} -> {:error, m}
+      :error -> :error
     end
   end
 
-  defp do_unify(_state, _term1, _term2), do: {:error, "unification failed"}
+  defp do_unify(_state, _term1, _term2), do: :error
 
   @doc """
   Determine if variable `var` occurs in `term`, which indicates a recursive relationship--a cycle in the implied graph of associations.
