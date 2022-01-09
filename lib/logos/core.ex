@@ -82,15 +82,16 @@ defmodule Logos.Core do
   @doc """
   Non-relational if-then-else goal.
   """
-  def switch(goal_cond, goal_then, goal_else) do
+  def switch(goal_cond, goal_cnsq, goal_alt) do
     fn %S{} = state ->
-      do_switch(state, goal_cond.(state), goal_then, goal_else)
+      do_switch(state, goal_cond.(state), goal_cnsq, goal_alt)
     end
   end
 
-  defp do_switch(_state, [_h | _t] = stream, g_then, _g_else), do: D.flat_map(stream, g_then)
-  defp do_switch(state, [], _g_then, g_else), do: g_else.(state)
+  defp do_switch(_state, [_h | _t] = stream, g_cnsq, _g_else), do: D.flat_map(stream, g_cnsq)
+  defp do_switch(state, [], _g_cnsq, g_alt), do: g_alt.(state)
 
-  defp do_switch(state, stream, g_then, g_else) when is_function(stream),
-    do: fn -> do_switch(state, stream.(), g_then, g_else) end
+  defp do_switch(state, stream, g_cnsq, g_alt) when is_function(stream) do
+    fn -> do_switch(state, stream.(), g_cnsq, g_alt) end
+  end
 end

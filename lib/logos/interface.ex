@@ -86,31 +86,32 @@ defmodule Logos.Interface do
   end
 
   @doc """
-  "Impure" relation that evaluates the first clauses whose condition goal is successful. Implicit conjunction is allowed for both the condition and consequence clauses.
+  "Impure" relation that evaluates the first consequence whose corresponding condition goal is successful. Implicit conjunction is allowed for both the condition and consequence clauses.
   """
   defmacro choice(do: [clause | other_clauses]) do
-    [g_cond, g_then] = choice_goals(clause)
+    [g_cond, g_cnsq] = choice_goals(clause)
 
-    do_choice(g_cond, g_then, other_clauses)
+    do_choice(g_cond, g_cnsq, other_clauses)
   end
 
-  defp do_choice(g_cond, g_then, []) do
+  defp do_choice(g_cond, g_cnsq, []) do
     quote do
-      [unquote(g_cond), unquote(g_then)]
+      [unquote(g_cond), unquote(g_cnsq)]
       |> Enum.map(&I.implicit_all/1)
       |> C.all()
     end
   end
 
-  defp do_choice(g_cond, g_then, [_h | _t] = clauses) do
+  defp do_choice(g_cond, g_cnsq, [_h | _t] = clauses) do
     quote do
       C.switch(
         I.implicit_all(unquote(g_cond)),
-        I.implicit_all(unquote(g_then)),
+        I.implicit_all(unquote(g_cnsq)),
         I.choice(do: unquote(clauses))
       )
     end
   end
 
-  defp choice_goals({:->, _, [[g_cond], g_then]}), do: [g_cond, g_then]
+  # Extract the condition and consequence goals from a line in the choice macro
+  defp choice_goals({:->, _, [[g_cond], g_cnsq]}), do: [g_cond, g_cnsq]
 end
