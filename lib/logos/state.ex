@@ -16,24 +16,12 @@ defmodule Logos.State do
   @doc """
   Fetch the value assocaited with the given logical `var`. This returns `{:ok, value}` if `var` is present, and `:error` otherwise.
   """
-  def fetch(%S{sub: sub}, key), do: Map.fetch(sub, key)
+  def fetch_sub(%S{sub: sub}, key), do: Map.fetch(sub, key)
 
   @doc """
-  Extend the state with the given key and value. This returns `{:ok, state}` if the extension is successful, and `:error` otherwise.
+  Extend the state substitution with the given key and value.
   """
-  def extend_sub(
-        %S{sub: sub} = state,
-        key,
-        value,
-        check_fn \\ fn _state, _key, _value -> true end
-      )
-      when is_function(check_fn, 3) do
-    if check_fn.(state, key, value) do
-      {:ok, %{state | sub: Map.put(sub, key, value)}}
-    else
-      :error
-    end
-  end
+  def put_sub(%S{sub: sub} = state, key, value), do: %{state | sub: Map.put(sub, key, value)}
 
   @doc """
   Increment the variable count in the state.
@@ -44,7 +32,7 @@ defmodule Logos.State do
   Retrieve the value associated with a term by traversing the relationships between variables in the state, and stopping when the value is a list or constant.
   """
   def walk(%S{} = state, term) do
-    case fetch(state, term) do
+    case fetch_sub(state, term) do
       {:ok, t} -> walk(state, t)
       :error -> term
     end
@@ -57,8 +45,8 @@ defmodule Logos.State do
   * May move to a more general place, since this has use beyond presentation, I think.
   """
   def walk_deep(%S{} = state, term) do
-    wterm = walk(state, term)
-    do_walk_deep(state, wterm)
+    term_walked = walk(state, term)
+    do_walk_deep(state, term_walked)
   end
 
   defp do_walk_deep(state, [h | t]), do: [walk_deep(state, h) | walk_deep(state, t)]

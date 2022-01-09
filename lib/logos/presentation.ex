@@ -40,7 +40,7 @@ defmodule Logos.Presentation do
 
   defp do_create_var_sub(%S{count: c} = state, %V{} = v) do
     rvar = present_var(c)
-    {:ok, state} = S.extend_sub(state, v, rvar)
+    state = S.put_sub(state, v, rvar)
     %{state | count: c + 1}
   end
 
