@@ -36,7 +36,7 @@ defmodule Logos.Core do
   def any([_h | _t] = goals) do
     fn %S{} = state ->
       goals
-      |> Enum.map(fn g -> delay(g).(state) end)
+      |> Enum.map(fn g -> delay_goal(g).(state) end)
       |> D.interleave()
     end
   end
@@ -44,12 +44,12 @@ defmodule Logos.Core do
   def any([]), do: failure()
 
   @doc """
-  Return a goal that represents conjunction over 0 or more goals.
+  Return a goal that represents conjunction over zero or more goals.
   """
   def all([_h | _t] = goals) do
     Enum.reduce(goals, fn g, acc ->
       fn %S{} = state ->
-        state |> delay(acc).() |> D.flat_map(g)
+        state |> delay_goal(acc).() |> D.flat_map(g)
       end
     end)
   end
@@ -68,7 +68,7 @@ defmodule Logos.Core do
   @doc """
   Return a goal that wraps the given goal in a thunk.
   """
-  def delay(goal) do
+  def delay_goal(goal) do
     fn %S{} = state ->
       fn -> goal.(state) end
     end
@@ -82,9 +82,9 @@ defmodule Logos.Core do
   @doc """
   Non-relational if-then-else goal.
   """
-  def switch(g_cond, g_then, g_else) do
+  def switch(goal_cond, goal_then, goal_else) do
     fn %S{} = state ->
-      do_switch(state, g_cond.(state), g_then, g_else)
+      do_switch(state, goal_cond.(state), goal_then, goal_else)
     end
   end
 
