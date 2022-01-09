@@ -20,9 +20,9 @@ defmodule Logos.Unification do
   Attempt to unify a pair of terms in the given state. This returns either `{:ok, <updated state>}` or `{:error, message}` if the terms cannot be unified.
   """
   def unify(%S{} = state, term1, term2) do
-    wterm1 = S.walk(state, term1)
-    wterm2 = S.walk(state, term2)
-    do_unify(state, wterm1, wterm2)
+    walked_term1 = S.walk(state, term1)
+    walked_term2 = S.walk(state, term2)
+    do_unify(state, walked_term1, walked_term2)
   end
 
   defp do_unify(state, term1, term2) when term1 == term2, do: {:ok, state}
@@ -37,4 +37,23 @@ defmodule Logos.Unification do
   end
 
   defp do_unify(_state, _term1, _term2), do: {:error, "unification failed"}
+
+  @doc """
+  Determine if variable `var` occurs in `term`, which indicates a recursive relationship--a cycle in the implied graph of associations.
+  """
+  def occurs?(%S{} = state, %V{} = var, term) do
+    walked_term = S.walk(state, term)
+    do_occurs(state, var, walked_term)
+  end
+
+  defp do_occurs(_state, var, %V{} = term), do: var == term
+
+  defp do_occurs(state, var, [h | t]) do
+    Kernel.or(
+      occurs?(state, var, h),
+      occurs?(state, var, t)
+    )
+  end
+
+  defp do_occurs(_state, _key, _term), do: false
 end
