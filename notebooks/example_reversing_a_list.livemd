@@ -1,0 +1,69 @@
+# Reversing a list
+
+## Section
+
+```elixir
+defmodule ReverseElixir do
+  def reverse(l, acc \\ [])
+
+  def reverse([h | t], acc) do
+    reverse(t, [h | acc])
+  end
+
+  def reverse([], acc), do: acc
+end
+```
+
+```elixir
+Reverse.reverse([1, 2, 3])
+```
+
+```elixir
+defmodule ReverseLogos do
+  use Logos
+
+  # defrule reverse(l, res) do
+  #   [empty(l), empty(res)]
+
+  #   with_vars [h, t, tr] do
+  #     [
+  #       prepend(h, t, l),
+  #       # why reverse not at end?
+  #       # reverse(t, tr),
+  #       concat(tr, [h], res),
+  #       reverse(t, tr)
+  #     ]
+  #   end
+  # end
+
+  defrule reverse(l, res, acc) do
+    [empty(l), equal(res, acc)]
+
+    with_vars [h, t] do
+      [
+        prepend(h, t, l),
+        # prepend(h, acc, new_acc),
+        reverse(t, res, [h | acc])
+      ]
+    end
+  end
+end
+```
+
+```elixir
+use Logos
+```
+
+```elixir
+# ask [l] do
+#   ReverseLogos.reverse([1, 2, 3], l)
+# end
+# |> Enum.to_list()
+```
+
+```elixir
+ask [l] do
+  ReverseLogos.reverse(l, [3, 2, 1], [])
+end
+|> Enum.to_list()
+```
