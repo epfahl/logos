@@ -7,7 +7,7 @@ defmodule Logos.Rule do
   import Logos.Core, only: [equal: 2]
 
   @doc """
-  Rule expressing equality with the empty list.
+  Rule expressing that list `l` is the empty list.
   """
   defrule empty(l) do
     equal(l, [])
@@ -21,7 +21,7 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that the head (first element) of list `l` is `h`.
+  Rule expressing that the head of list `l` is head `h`.
   """
   defrule head(l, h) do
     with_vars [t] do
@@ -30,7 +30,7 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that the tail (everything but the first elememnt) of list `l` is `t`.
+  Rule expressing that the tail of list `l` is list `t`.
   """
   defrule tail(l, t) do
     with_vars [h] do
@@ -39,7 +39,7 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that `l` is a proper list.
+  Rule expressing that list `l` is a _proper_ list.
   """
   defrule proper_list(l) do
     empty(l)
