@@ -6,26 +6,41 @@ defmodule Logos.Rule do
   import Logos.Interface, only: [defrule: 2, with_vars: 2]
   import Logos.Core, only: [equal: 2]
 
+  @doc """
+  Rule expressing equality with the empty list.
+  """
   defrule empty(l) do
     equal(l, [])
   end
 
+  @doc """
+  Rule expressing that when value `h` is prepended onto list `t` (i.e., `[h | t]`), the result is `res`.
+  """
   defrule prepend(h, t, res) do
     equal([h | t], res)
   end
 
+  @doc """
+  Rule expressing that the head (first element) of list `l` is `h`.
+  """
   defrule head(l, h) do
     with_vars [t] do
       equal([h | t], l)
     end
   end
 
+  @doc """
+  Rule expressing that the tail (everything but the first elememnt) of list `l` is `t`.
+  """
   defrule tail(l, t) do
     with_vars [h] do
       equal([h | t], l)
     end
   end
 
+  @doc """
+  Rule expressing that `l` is a proper list.
+  """
   defrule proper_list(l) do
     empty(l)
 
@@ -36,6 +51,9 @@ defmodule Logos.Rule do
     ]
   end
 
+  @doc """
+  Rule expressing that element `x` is contained in proper list `l`.
+  """
   defrule member(x, l) do
     [
       head(l, x),
@@ -51,6 +69,9 @@ defmodule Logos.Rule do
     ]
   end
 
+  @doc """
+  Rule expressing that list `a` concatenated with list `b` yields the resulting list `res`.
+  """
   defrule concat(a, b, res) do
     [empty(a), equal(b, res)]
 
