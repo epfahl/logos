@@ -229,6 +229,4 @@ end
 |> Enum.to_list()
 ```
 
-## Where to go from here?
-
-TBD
+While there are extensions to the core language, such as arithmetic operators and "impure" rules, all "pure" logical goals can be build from `equal` and `with_vars` when implicit conjunction and disjunction are used.
