@@ -1,6 +1,6 @@
 defmodule Logos.State do
   @moduledoc """
-  Defines the struct for holding variable bindings, along with functions for interacting with the state.
+  Defines the state struct and functions for interacting with the state.
 
   The state holds a counter for the number of created logical variables, and a map from variables to their subitution values. All low-level interactions with a state take place through the functions in this module.
   """
@@ -40,9 +40,6 @@ defmodule Logos.State do
 
   @doc """
   Deeply traverse the state by walking both variables and lists that may contain variables.
-
-  Notes
-  * May move to a more general place, since this has use beyond presentation, I think.
   """
   def walk_deep(%S{} = state, term) do
     term_walked = walk(state, term)

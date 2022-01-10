@@ -16,7 +16,7 @@ defmodule Logos.DelayedList do
   @doc """
   Interleave a pair of delayed lists.
 
-  This is effectively `mplus` in µKanren.
+  This is similar to `mplus` in µKanren.
   """
   def interleave(dl1, dl2)
   def interleave([], dl2), do: dl2
@@ -34,6 +34,8 @@ defmodule Logos.DelayedList do
 
   @doc """
   Given a mapping function that returns a delayed list, return a flattened delayed list.
+
+  This is similar to `bind` in µKanren.
   """
   def flat_map(dl, mapper)
   def flat_map([h | t], mapper), do: interleave(mapper.(h), flat_map(t, mapper))

@@ -232,10 +232,3 @@ end
 ## Where to go from here?
 
 TBD
-
-```elixir
-ask [x] do
-  empty([])
-end
-|> Enum.to_list()
-```
