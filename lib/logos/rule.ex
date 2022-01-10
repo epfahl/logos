@@ -21,18 +21,18 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that the head of list `l` is head `h`.
+  Rule expressing that `h` is the head of list `l`.
   """
-  defrule head(l, h) do
+  defrule head(h, l) do
     with_vars [t] do
       equal([h | t], l)
     end
   end
 
   @doc """
-  Rule expressing that the tail of list `l` is list `t`.
+  Rule expressing that `t` is the tail of list `l`.
   """
-  defrule tail(l, t) do
+  defrule tail(t, l) do
     with_vars [h] do
       equal([h | t], l)
     end
@@ -46,7 +46,7 @@ defmodule Logos.Rule do
 
     [
       with_vars [t] do
-        [tail(l, t), proper_list(t)]
+        [tail(t, l), proper_list(t)]
       end
     ]
   end
@@ -56,17 +56,15 @@ defmodule Logos.Rule do
   """
   defrule member(x, l) do
     [
-      head(l, x),
+      head(x, l),
       with_vars [t] do
-        [tail(l, t), proper_list(t)]
+        [tail(t, l), proper_list(t)]
       end
     ]
 
-    [
-      with_vars [t] do
-        [tail(l, t), member(x, t)]
-      end
-    ]
+    with_vars [t] do
+      [tail(t, l), member(x, t)]
+    end
   end
 
   @doc """
