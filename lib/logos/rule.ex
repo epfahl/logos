@@ -156,14 +156,12 @@ defmodule Logos.Rule do
   defrule concat(a, b, res) do
     [empty(a), equal(b, res)]
 
-    [
-      with_vars [h, t, res_part] do
-        [
-          prepend(h, t, a),
-          prepend(h, res_part, res),
-          concat(t, b, res_part)
-        ]
-      end
-    ]
+    with_vars [h, t, res_part] do
+      [
+        prepend(h, t, a),
+        prepend(h, res_part, res),
+        concat(t, b, res_part)
+      ]
+    end
   end
 end
