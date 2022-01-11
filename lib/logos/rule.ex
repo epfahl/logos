@@ -104,11 +104,9 @@ defmodule Logos.Rule do
   defrule proper_list(l) do
     empty(l)
 
-    [
-      with_vars [t] do
-        [tail(t, l), proper_list(t)]
-      end
-    ]
+    with_vars [t] do
+      [tail(t, l), proper_list(t)]
+    end
   end
 
   @doc """
