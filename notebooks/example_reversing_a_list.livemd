@@ -4,46 +4,40 @@
 
 ```elixir
 defmodule ReverseElixir do
-  def reverse(l, acc \\ [])
-
-  def reverse([h | t], acc) do
-    reverse(t, [h | acc])
-  end
-
+  def reverse(l), do: reverse(l, [])
+  def reverse([h | t], acc), do: reverse(t, [h | acc])s
   def reverse([], acc), do: acc
 end
 ```
 
 ```elixir
-Reverse.reverse([1, 2, 3])
+ReverseElixir.reverse([1, 2, 3, 4])
 ```
 
 ```elixir
 defmodule ReverseLogos do
   use Logos
 
-  # defrule reverse(l, res) do
-  #   [empty(l), empty(res)]
+  defrule reverse(l, res) do
+    [empty(l), empty(res)]
 
-  #   with_vars [h, t, tr] do
-  #     [
-  #       prepend(h, t, l),
-  #       # why reverse not at end?
-  #       # reverse(t, tr),
-  #       concat(tr, [h], res),
-  #       reverse(t, tr)
-  #     ]
-  #   end
-  # end
+    with_vars [h, t, tr] do
+      [
+        prepend(h, t, l),
+        # reverse(t, tr),
+        concat(tr, [h], res),
+        reverse(t, tr)
+      ]
+    end
+  end
 
-  defrule reverse(l, res, acc) do
+  defrule reverse_acc(l, res, acc) do
     [empty(l), equal(res, acc)]
 
     with_vars [h, t] do
       [
         prepend(h, t, l),
-        # prepend(h, acc, new_acc),
-        reverse(t, res, [h | acc])
+        reverse_acc(t, res, [h | acc])
       ]
     end
   end
@@ -55,15 +49,38 @@ use Logos
 ```
 
 ```elixir
-# ask [l] do
-#   ReverseLogos.reverse([1, 2, 3], l)
-# end
-# |> Enum.to_list()
+ask [h, t] do
+  with_vars [l] do
+    prepend(h, t, l)
+  end
+end
+|> Enum.take(10)
 ```
 
 ```elixir
-ask [l] do
-  ReverseLogos.reverse(l, [3, 2, 1], [])
+ask [x, y] do
+  concat(x, y, [1, 2, 3])
 end
-|> Enum.to_list()
+|> Enum.take(5)
 ```
+
+```elixir
+# It looks like this always works when both args are "complete" lists (see The Art of Prolog).
+# Can we have a version of reverse that dispatches to the right version when one or the other side
+# is a complete list?
+ask [x, y] do
+  ReverseLogos.reverse([x, y], [2, 1])
+end
+|> Enum.take(10)
+```
+
+```elixir
+ask [x] do
+  ReverseLogos.reverse_acc([1, 2], x, [])
+end
+|> Enum.take(1)
+```
+
+Check the call stack for take(1) for the naive and accumulated versions.
+
+See The Art of Prolog p109 for backstory.

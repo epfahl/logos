@@ -42,8 +42,8 @@ defmodule Logos.Rule do
     ...> |> Enum.to_list()
     [[[2, 3]]]
   """
-  defrule prepend(x, l, res) do
-    equal([x | l], res)
+  defrule prepend(h, t, res) do
+    equal([h | t], res)
   end
 
   @doc """
