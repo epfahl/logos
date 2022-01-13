@@ -88,10 +88,10 @@ defmodule Logos.Core do
     end
   end
 
-  defp do_switch(_state, [_h | _t] = stream, g_cnsq, _g_else), do: D.flat_map(stream, g_cnsq)
-  defp do_switch(state, [], _g_cnsq, g_alt), do: g_alt.(state)
+  defp do_switch(_state, [_h | _t] = stream, g_conc, _g_else), do: D.flat_map(stream, g_conc)
+  defp do_switch(state, [], _g_conc, g_alt), do: g_alt.(state)
 
-  defp do_switch(state, stream, g_cnsq, g_alt) when is_function(stream) do
-    fn -> do_switch(state, stream.(), g_cnsq, g_alt) end
+  defp do_switch(state, stream, g_conc, g_alt) when is_function(stream) do
+    fn -> do_switch(state, stream.(), g_conc, g_alt) end
   end
 end
