@@ -1,86 +1,299 @@
 # Reversing a list
 
-## Section
+## Background
+
+The problem of reversing a list is a simple, but illustrative demonstration of the expressive power and practical considerations of logic programming. To lay the conceptual and concrete groundwork for a solution in Logos, it makes sense to first develop a solution in pure Elixir. For both the Elixir and Logos implementations, two different recursive algorithms will be presented. One approach is straightforward, but relatively inefficient. The second algorithm makes use of an accumulator and is a more computationally efficient strategy.
+
+## Elixir solution
 
 ```elixir
-defmodule ReverseElixir do
-  def reverse(l), do: reverse(l, [])
-  def reverse([h | t], acc), do: reverse(t, [h | acc])s
-  def reverse([], acc), do: acc
+defmodule Reverse.Elixir do
+  @doc """
+  List reversal using a simple recursive approach where the solution is built by
+  adding the head of the current list to the end of the reverse of the tail. This
+  appraoch is not tail recursive, and the list concatenation step is relatively
+  expensive for linked lists. 
+  """
+  def reverse1([]), do: []
+  def reverse1([h | t]), do: reverse1(t) ++ [h]
+
+  @doc """
+  List reversal using a recursive approach where the solution is built by prepending
+  the head of the current list onto an initially empty accumulator list. This approach
+  is tail recursive and uses the linked list efficiently.
+  """
+  def reverse2(l), do: reverse2(l, [])
+  def reverse2([h | t], acc), do: reverse2(t, [h | acc])
+  def reverse2([], acc), do: acc
+end
+
+# Function to roughly estimate execution time in seconds
+timer = fn fun ->
+  fun
+  |> :timer.tc()
+  |> elem(0)
+  |> Kernel./(1_000_000)
 end
 ```
 
-```elixir
-ReverseElixir.reverse([1, 2, 3, 4])
-```
+The docstrings above briefly describe the two solutions and their differences. Let's verify that they produce the same expected results:
 
 ```elixir
-defmodule ReverseLogos do
+l = [1, 2, 3, 4]
+
+IO.inspect(Reverse.Elixir.reverse1(l))
+
+Reverse.Elixir.reverse1(l) == Reverse.Elixir.reverse2(l)
+```
+
+A simple timing experiment shows that the performance of the two algorithms is very different.
+
+```elixir
+l = 1..10_000 |> Enum.to_list()
+
+t1 = timer.(fn -> Reverse.Elixir.reverse1(l) end)
+t2 = timer.(fn -> Reverse.Elixir.reverse2(l) end)
+
+t1 / t2
+
+IO.inspect(t2)
+```
+
+The accumulator-based algorithm is _orders of magnitude_ faster for sufficiently large lists.
+
+## Logos solution
+
+The Logos interpretations of the two algorithms are given below.
+
+```elixir
+defmodule Reverse.Logos do
   use Logos
 
-  defrule reverse(l, res) do
+  @doc """
+  Logos interpretation of naive recursive algorithm in `Reverse.Elixir.reverse1`.
+  """
+  defrule reverse1(l, res) do
+    # An empty list `l` means the result `res` is also empty.
     [empty(l), empty(res)]
 
+    # For a non-empty list, define 3 new variables: the head `h` and tail `t` of
+    # the list `l`, as well as a variable `tr` that represents the reverse of `t`. 
     with_vars [h, t, tr] do
       [
+        # The list `l` is obtained by prepending the head `h` onto the tail `t`.
         prepend(h, t, l),
-        # reverse(t, tr),
-        concat(tr, [h], res),
-        reverse(t, tr)
+
+        # Recursive step that defines the reverse of the tail as `tr`.
+        reverse1(t, tr),
+
+        # The concatenation of the reverse of the tail `tr` and the list `[h]` with
+        # only the head is the final result `res`.
+        concat(tr, [h], res)
       ]
     end
   end
 
-  defrule reverse_acc(l, res, acc) do
+  @doc """
+  Logos interpretation of accumulator-based algorithm in `Reverse.Elixir.reverse2`.
+  """
+  defrule reverse2(l, res) do
+    # Call `reverse2/2` with the accumulator (third arg) initialized to an
+    # empty list.
+    reverse2(l, res, [])
+  end
+
+  defrule reverse2(l, res, acc) do
+    # When the list `l` is empty, the result `res` is bound to the accumulator `acc`.
+    # This is the only clause that binds `res` or any part of `res` to a value.
     [empty(l), equal(res, acc)]
 
+    # For a non-empty list, define 2 new variables: the head `h` and tail `t` of the
+    # list `l`.
     with_vars [h, t] do
       [
+        # The list `l` is obtained by prepending the head `h` onto the tail `t`.
         prepend(h, t, l),
-        reverse_acc(t, res, [h | acc])
+
+        # Recursive step that reverses the tail `t` and updates the accumulator by
+        # prepending the head `h` of the list `l`.
+        reverse2(t, res, [h | acc])
       ]
     end
   end
 end
 ```
+
+The comment annotations above briefly describe the different components of the algorithms. There are clear parallels with the Elixir implementations. For instance, the clauses that handle the case where `l` is empty are almost direct translations. Also, when an Elixir function clause pattern matches `[h | t]` in the argument, the corresponding Logos clause is `prepend(h, t, l)`, another straightforward translation.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Let's ensure that these Logos rules behave as expected. First, access the high-level Logos interface:
 
 ```elixir
 use Logos
 ```
 
+Test the naive implemention:
+
 ```elixir
-ask [h, t] do
-  with_vars [l] do
-    prepend(h, t, l)
+ask [r] do
+  Reverse.Logos.reverse1([1, 2, 3, 4], r)
+end
+|> Enum.take(1)
+```
+
+Good so far. Now for the accumulator-based algorithm:
+
+```elixir
+ask [r] do
+  Reverse.Logos.reverse2([1, 2, 3, 4], r)
+end
+|> Enum.take(1)
+```
+
+Both algorithms work as expected for these inputs. As with other Logos rules, it should be possible to run `reverse` in reverse, by putting the "result" in the second argument and asking for the first argument. Do both algorithms still behave as expected?
+
+```elixir
+ask [l] do
+  Reverse.Logos.reverse1(l, [4, 3, 2, 1])
+end
+|> Enum.take(1)
+```
+
+```elixir
+ask [l] do
+  Reverse.Logos.reverse2(l, [4, 3, 2, 1])
+end
+|> Enum.take(1)
+```
+
+Excellent! Now let's take a peak at the relative computational performance of these two approaches:
+
+```elixir
+l = 1..10_000 |> Enum.to_list()
+
+q1 =
+  ask [r] do
+    Reverse.Logos.reverse1([1, 2, 3, 4], r)
+  end
+
+q2 =
+  ask [r] do
+    Reverse.Logos.reverse2([1, 2, 3, 4], r)
+  end
+
+t1 = timer.(fn -> q1 |> Enum.take(1) end)
+t2 = timer.(fn -> q2 |> Enum.take(1) end)
+
+t1 / t2
+```
+
+The runtime ratio isn't nearly as dramatic as in the pure Elixir case, but it's still true that the accumulator-based solution is much faster. The details of the absolute and relative performances of the Elixir and Logos versions will not be investigated here, but this would be an interesting project.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Both algorithms work as expected in these tests. But these tests are very basic; they don't take advantage of the pull power of logic programming. Below is a series of experiments that dig a little deeper into the expressiveness of Logos. In what follows, only the accumulator version of reverse (`reverse2`) will be used.
+
+```elixir
+# Verify success for given, grounded input and output lists
+
+ask [x] do
+  Reverse.Logos.reverse2([1, 2, 3], [3, 2, 1])
+end
+|> Enum.take(1)
+```
+
+```elixir
+# Infer the values in the reverse list
+
+ask [x, y] do
+  Reverse.Logos.reverse2([1, 2], [x, y])
+end
+|> Enum.take(1)
+```
+
+```elixir
+# Infer the missing values in the list/reverse-list pair
+
+ask [x, y] do
+  Reverse.Logos.reverse2([1, 2, x], [3, y, 1])
+end
+|> Enum.take(1)
+```
+
+```elixir
+# Create a rule that succeeds if a list is a palindrome
+
+defmodule Palindrome do
+  use Logos
+  import Reverse.Logos, only: [reverse2: 2]
+
+  defrule palindrome(l) do
+    with_vars [r] do
+      [reverse2(l, r), equal(l, r)]
+    end
+  end
+end
+```
+
+```elixir
+# Verify that the given given list is a palindrome
+
+ask [x] do
+  Palindrome.palindrome([1, 2, 3, 2, 1])
+end
+|> Enum.take(1)
+```
+
+```elixir
+# Show the variable structure of all possible palindromes
+
+ask [p] do
+  Palindrome.palindrome(p)
+end
+|> Enum.take(10)
+```
+
+```elixir
+# Infer the missing values in the given palindrome
+
+ask [x, y] do
+  Palindrome.palindrome([1, x, 3, 2, y])
+end
+|> Enum.take(1)
+```
+
+```elixir
+# Generate 3-letter palindromes from a set of letters
+
+letters = ["h", "a", "e", "u"]
+
+ask [p] do
+  with_vars [x, y, z] do
+    [
+      member(x, letters),
+      member(y, letters),
+      member(z, letters),
+      equal([x, y, z], p),
+      Palindrome.palindrome(p)
+    ]
   end
 end
 |> Enum.take(10)
 ```
 
-```elixir
-ask [x, y] do
-  concat(x, y, [1, 2, 3])
-end
-|> Enum.take(5)
-```
-
-```elixir
-# It looks like this always works when both args are "complete" lists (see The Art of Prolog).
-# Can we have a version of reverse that dispatches to the right version when one or the other side
-# is a complete list?
-ask [x, y] do
-  ReverseLogos.reverse([x, y], [2, 1])
-end
-|> Enum.take(10)
-```
-
-```elixir
-ask [x] do
-  ReverseLogos.reverse_acc([1, 2], x, [])
-end
-|> Enum.take(1)
-```
+## Interminable problems
 
 Check the call stack for take(1) for the naive and accumulated versions.
 
 See The Art of Prolog p109 for backstory.
+
+It looks like this always works when both args are "complete" lists (see The Art of Prolog).
+Can we have a version of reverse that dispatches to the right version when one or the other side is a complete list?
+
+Resolutions:
+
+* Choose only first solution, regardless of goal ordering
+* Ensure both inputs are "complete" lists.
+* A dispatch-based solution that chooses a branch depending on the inputs.
+  * Can this be done purely logically?
