@@ -55,8 +55,6 @@ t1 = timer.(fn -> Reverse.Elixir.reverse1(l) end)
 t2 = timer.(fn -> Reverse.Elixir.reverse2(l) end)
 
 t1 / t2
-
-IO.inspect(t2)
 ```
 
 The accumulator-based algorithm is _orders of magnitude_ faster for sufficiently large lists.
@@ -237,10 +235,14 @@ end
 ```
 
 ```elixir
+import Palindrome
+```
+
+```elixir
 # Verify that the given given list is a palindrome
 
 ask [x] do
-  Palindrome.palindrome([1, 2, 3, 2, 1])
+  palindrome([1, 2, 3, 2, 1])
 end
 |> Enum.take(1)
 ```
@@ -249,7 +251,7 @@ end
 # Show the variable structure of all possible palindromes
 
 ask [p] do
-  Palindrome.palindrome(p)
+  palindrome(p)
 end
 |> Enum.take(10)
 ```
@@ -258,7 +260,7 @@ end
 # Infer the missing values in the given palindrome
 
 ask [x, y] do
-  Palindrome.palindrome([1, x, 3, 2, y])
+  palindrome([1, x, 3, 2, y])
 end
 |> Enum.take(1)
 ```
@@ -266,7 +268,7 @@ end
 ```elixir
 # Generate 3-letter palindromes from a set of letters
 
-letters = ["h", "a", "e", "u"]
+letters = ["p", "a", "e", "i", "o", "u"]
 
 ask [p] do
   with_vars [x, y, z] do
@@ -275,7 +277,7 @@ ask [p] do
       member(y, letters),
       member(z, letters),
       equal([x, y, z], p),
-      Palindrome.palindrome(p)
+      palindrome(p)
     ]
   end
 end
@@ -297,3 +299,11 @@ Resolutions:
 * Ensure both inputs are "complete" lists.
 * A dispatch-based solution that chooses a branch depending on the inputs.
   * Can this be done purely logically?
+
+```elixir
+import Logos.DelayedList
+```
+
+```elixir
+interleave([1, 2, 3], ["a", "b", "c"]) |> take(6)
+```

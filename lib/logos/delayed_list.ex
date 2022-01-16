@@ -17,6 +17,12 @@ defmodule Logos.DelayedList do
   Interleave a pair of delayed lists.
 
   This is similar to `mplus` in µKanren.
+
+  ## Examples
+
+    iex> import Logos.DelayedList
+    iex> interleave([1, 2, 3], ["a", "b", "c"]) |> take(6)
+    [1, "a", 2, "b", 3, "c"]
   """
   def interleave(dl1, dl2)
   def interleave([], dl2), do: dl2
@@ -24,12 +30,13 @@ defmodule Logos.DelayedList do
   def interleave(dl1, dl2) when is_function(dl1, 0),
     do: fn -> interleave(dl2, dl1.()) end
 
-  def interleave([h | t], dl2), do: [h | interleave(dl2, t)]
-  def interleave([dl]), do: dl
+  # Yields an improper list; mimics mplus implementation in Rosenblatt et al. (2019)
+  def interleave([h | t], dl2), do: [h | fn -> interleave(dl2, t) end]
 
   @doc """
   Interleave a list of delayed lists.
   """
+  def interleave([dl]), do: dl
   def interleave([h | t]), do: interleave(h, interleave(t))
 
   @doc """
@@ -45,6 +52,24 @@ defmodule Logos.DelayedList do
     do: fn -> flat_map(dl.(), mapper) end
 
   @doc """
+  Advance the stream until it is a list, a "mature" stream in the language of miniKanren.
+  """
+  def advance(dl) when is_list(dl), do: dl
+  def advance(dl) when is_function(dl, 0), do: advance(dl.())
+
+  @doc """
+  Return a list of the first `n` concrete elements.
+  """
+  def take(_dl, 0), do: []
+
+  def take(dl, n) when is_integer(n) and n > 0 do
+    case advance(dl) do
+      [h | t] -> [h | take(t, n - 1)]
+      _ -> []
+    end
+  end
+
+  @doc """
   Convert a delayed list to an Elixir `Stream`.
   """
   def to_stream(dl) do
@@ -56,6 +81,6 @@ defmodule Logos.DelayedList do
   end
 
   defp stream_next([]), do: {:halt, []}
-  defp stream_next(dl) when is_function(dl), do: {[], dl.()}
+  defp stream_next(dl) when is_function(dl, 0), do: {[], dl.()}
   defp stream_next([h | t]), do: {[h], t}
 end
