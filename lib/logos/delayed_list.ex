@@ -23,6 +23,8 @@ defmodule Logos.DelayedList do
     iex> import Logos.DelayedList
     iex> interleave([1, 2, 3], ["a", "b", "c"]) |> take(6)
     [1, "a", 2, "b", 3, "c"]
+    iex> interleave([1, 2], ["a", "b", "c"]) |> take(5)
+    [1, "a", 2, "b", "c"]
   """
   def interleave(dl1, dl2)
   def interleave([], dl2), do: dl2
@@ -35,6 +37,12 @@ defmodule Logos.DelayedList do
 
   @doc """
   Interleave a list of delayed lists.
+
+  ## Examples
+
+    iex> import Logos.DelayedList
+    iex> interleave([[1, 2], ["a", "b", "c"], [:one, :two]]) |> take(7)
+    [1, "a", 2, :one, "b", :two, "c"]
   """
   def interleave([dl]), do: dl
   def interleave([h | t]), do: interleave(h, interleave(t))

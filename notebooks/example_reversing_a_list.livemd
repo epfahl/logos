@@ -299,11 +299,3 @@ Resolutions:
 * Ensure both inputs are "complete" lists.
 * A dispatch-based solution that chooses a branch depending on the inputs.
   * Can this be done purely logically?
-
-```elixir
-import Logos.DelayedList
-```
-
-```elixir
-interleave([1, 2, 3], ["a", "b", "c"]) |> take(6)
-```
