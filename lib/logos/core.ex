@@ -80,7 +80,8 @@ defmodule Logos.Core do
   def call_on_empty(goal), do: goal.(S.empty()) |> D.to_stream()
 
   @doc """
-  Non-relational if-then-else rule. If the _condition_ goal succeeds, the _conclusion_ goal is pursued; otherwise, the _alternative_ goal is pursued.
+  Non-relational if-then-else rule. If the _condition_ goal succeeds, the _conclusion_ goal is
+  pursued; otherwise, the _alternative_ goal is pursued.
   """
   def switch(goal_cond, goal_conc, goal_alt) do
     fn %S{} = state ->

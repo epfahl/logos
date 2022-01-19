@@ -7,7 +7,8 @@ defmodule Logos.Unification do
   alias Logos.State, as: S
 
   @doc """
-  Attempt to unify a pair of terms in the given state. This returns either `{:ok, <updated state>}` or `{:error, message}` if the terms cannot be unified.
+  Attempt to unify a pair of terms in the given state. This returns either
+  `{:ok, <updated state>}` or `{:error, message}` if the terms cannot be unified.
   """
   def unify(%S{} = state, term1, term2) do
     term1_walked = S.walk(state, term1)
@@ -29,7 +30,8 @@ defmodule Logos.Unification do
   defp do_unify(_state, _term1, _term2), do: :error
 
   @doc """
-  Determine if variable `var` occurs in `term`, which indicates a recursive relationship--a cycle in the implied graph of associations.
+  Determine if variable `var` occurs in `term`, which indicates a recursive
+  relationship--a cycle in the implied graph of associations.
   """
   def occurs?(%S{} = state, %V{} = var, term) do
     term_walked = S.walk(state, term)

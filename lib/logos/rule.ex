@@ -31,7 +31,8 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that when value `h` is prepended onto list `t` (i.e., `[h | t]`), the result is `res`.
+  Rule expressing that when value `h` is prepended onto list `t` (i.e., `[h | t]`), the result is
+  `res`.
 
   ## Examples
 

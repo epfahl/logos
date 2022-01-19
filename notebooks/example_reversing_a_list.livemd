@@ -2,7 +2,13 @@
 
 ## Background
 
-The problem of reversing a list is a simple, but illustrative demonstration of the expressive power and practical considerations of logic programming. To lay the conceptual and concrete groundwork for a solution in Logos, it makes sense to first develop a solution in pure Elixir. For both the Elixir and Logos implementations, two different recursive algorithms will be presented. One approach is straightforward, but relatively inefficient. The second algorithm makes use of an accumulator and is a more computationally efficient strategy.
+The problem of reversing a list is a simple, but illustrative demonstration of the 
+expressive power and practical considerations of logic programming. To lay the conceptual 
+and concrete groundwork for a solution in Logos, it makes sense to first develop a 
+solution in pure Elixir. For both the Elixir and Logos implementations, two different 
+recursive algorithms will be presented. One approach is straightforward, but relatively 
+inefficient. The second algorithm makes use of an accumulator and is a more 
+computationally efficient strategy.
 
 ## Elixir solution
 
@@ -36,7 +42,8 @@ timer = fn fun ->
 end
 ```
 
-The docstrings above briefly describe the two solutions and their differences. Let's verify that they produce the same expected results:
+The docstrings above briefly describe the two solutions and their differences. Let's verify 
+that they produce the same expected results:
 
 ```elixir
 l = [1, 2, 3, 4]
@@ -46,7 +53,8 @@ IO.inspect(Reverse.Elixir.reverse1(l))
 Reverse.Elixir.reverse1(l) == Reverse.Elixir.reverse2(l)
 ```
 
-A simple timing experiment shows that the performance of the two algorithms is very different.
+A simple timing experiment shows that the performance of the two algorithms is very 
+different.
 
 ```elixir
 l = 1..10_000 |> Enum.to_list()
@@ -121,11 +129,16 @@ defmodule Reverse.Logos do
 end
 ```
 
-The comment annotations above briefly describe the different components of the algorithms. There are clear parallels with the Elixir implementations. For instance, the clauses that handle the case where `l` is empty are almost direct translations. Also, when an Elixir function clause pattern matches `[h | t]` in the argument, the corresponding Logos clause is `prepend(h, t, l)`, another straightforward translation.
+The comment annotations above briefly describe the different components of the algorithms. 
+There are clear parallels with the Elixir implementations. For instance, the clauses that 
+handle the case where `l` is empty are almost direct translations. Also, when an Elixir 
+function clause pattern matches `[h | t]` in the argument, the corresponding Logos clause 
+is `prepend(h, t, l)`, another straightforward translation.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Let's ensure that these Logos rules behave as expected. First, access the high-level Logos interface:
+Let's ensure that these Logos rules behave as expected. First, access the high-level Logos 
+interface:
 
 ```elixir
 use Logos
@@ -149,7 +162,9 @@ end
 |> Enum.take(1)
 ```
 
-Both algorithms work as expected for these inputs. As with other Logos rules, it should be possible to run `reverse` in reverse, by putting the "result" in the second argument and asking for the first argument. Do both algorithms still behave as expected?
+Both algorithms work as expected for these inputs. As with other Logos rules, it should be 
+possible to run `reverse` in reverse, by putting the "result" in the second argument and 
+asking for the first argument. Do both algorithms still behave as expected?
 
 ```elixir
 ask [l] do
@@ -165,7 +180,8 @@ end
 |> Enum.take(1)
 ```
 
-Excellent! Now let's take a peak at the relative computational performance of these two approaches:
+Excellent! Now let's take a peak at the relative computational performance of these two 
+approaches:
 
 ```elixir
 l = 1..10_000 |> Enum.to_list()
@@ -186,11 +202,17 @@ t2 = timer.(fn -> q2 |> Enum.take(1) end)
 t1 / t2
 ```
 
-The runtime ratio isn't nearly as dramatic as in the pure Elixir case, but it's still true that the accumulator-based solution is much faster. The details of the absolute and relative performances of the Elixir and Logos versions will not be investigated here, but this would be an interesting project.
+The runtime ratio isn't nearly as dramatic as in the pure Elixir case, but it's still true 
+that the accumulator-based solution is much faster. The details of the absolute and 
+relative performances of the Elixir and Logos versions will not be investigated here, but 
+this would be an interesting project.
 
 <!-- livebook:{"break_markdown":true} -->
 
-Both algorithms work as expected in these tests. But these tests are very basic; they don't take advantage of the pull power of logic programming. Below is a series of experiments that dig a little deeper into the expressiveness of Logos. In what follows, only the accumulator version of reverse (`reverse2`) will be used.
+Both algorithms work as expected in these tests. But these tests are very basic; they don't 
+take advantage of the pull power of logic programming. Below is a series of experiments 
+that dig a little deeper into the expressiveness of Logos. In what follows, only the 
+accumulator version of reverse (`reverse2`) will be used.
 
 ```elixir
 # Verify success for given, grounded input and output lists
@@ -290,7 +312,7 @@ Check the call stack for take(1) for the naive and accumulated versions.
 
 See The Art of Prolog p109 for backstory.
 
-It looks like this always works when both args are "complete" lists (see The Art of Prolog).
+It looks like this always works when both args are "complete" lists (see The Art of Prolog). 
 Can we have a version of reverse that dispatches to the right version when one or the other side is a complete list?
 
 Resolutions:

@@ -15,7 +15,8 @@ defmodule Logos.Interface do
   def implicit_all(goal), do: goal
 
   @doc """
-  Return a goal that is the disjunction over conjunction clauses, where each clause is a list of goals that represents and implicit conjunction.
+  Return a goal that is the disjunction over conjunction clauses, where each clause is a list of
+  goals that represents and implicit conjunction.
   """
   defmacro fork(do: clause_block) do
     clauses = fork_clauses(clause_block)
@@ -32,7 +33,8 @@ defmodule Logos.Interface do
   defp fork_clauses(clause), do: [clause]
 
   @doc """
-  Inject logical variables into a relational expression and return the resulting goal. If `with_vars` is given a list of goals, it is treated as an implicit conjunction.
+  Inject logical variables into a relational expression and return the resulting goal. If
+  `with_vars` is given a list of goals, it is treated as an implicit conjunction.
   """
   defmacro with_vars([var | t], do: any_clause_block) do
     quote do
@@ -53,7 +55,9 @@ defmodule Logos.Interface do
   end
 
   @doc """
-  Execute a query for a list of requested variables by calling the provided goal with an empty state. The results are provided as an Elixir stream. If `ask` is given a list of goals, it is treated as an implicit conjunction.
+  Execute a query for a list of requested variables by calling the provided goal with an empty
+  state. The results are provided as an Elixir stream. If `ask` is given a list of goals, it is
+  treated as an implicit conjunction.
   """
   defmacro ask(vars, do: any_clause_block) when is_list(vars) do
     quote do
@@ -86,7 +90,8 @@ defmodule Logos.Interface do
   end
 
   @doc """
-  "Impure" relation that evaluates the first consequence whose corresponding condition goal is successful. Implicit conjunction is allowed for both the condition and consequence clauses.
+  "Impure" relation that evaluates the first consequence whose corresponding condition goal is
+  successful. Implicit conjunction is allowed for both the condition and consequence clauses.
   """
   defmacro choice(do: [clause | other_clauses]) do
     [g_cond, g_cnsq] = choice_goals(clause)

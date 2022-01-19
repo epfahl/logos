@@ -7,7 +7,8 @@ defmodule Logos.Presentation do
   alias Logos.State, as: S
 
   @doc """
-  Present a term by finding its most grounded value in a state and, if the value is a variable, creating an abstract representation.
+  Present a term by finding its most grounded value in a state and, if the value is a variable,
+  creating an abstract representation.
   """
   def present(term) do
     fn %S{} = state ->

@@ -1,6 +1,7 @@
 defmodule Logos.DelayedList do
   @moduledoc """
-  Functions needed for interacting with a delayed list--a custom stream-like implementation that largely mirrors what is used in miniKanren and µKanren.
+  Functions needed for interacting with a delayed list--a custom stream-like implementation that
+  largely mirrors what is used in miniKanren and µKanren.
   """
 
   @doc """
