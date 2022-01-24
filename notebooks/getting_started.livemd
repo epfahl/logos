@@ -2,7 +2,7 @@
 
 ## What is Logos?
 
-**Logos: The Greek root (λόγοϚ) of the word _logic_.**
+**Logos: The Greek (λόγοϚ) root of the word _logic_.**
 
 `Logos` is a relatively small Elixir-hosted logic (aka _relational_) programming language
 adapted from miniKanren and µKanren. An attempt was made to create an interface that looks

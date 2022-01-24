@@ -2,12 +2,14 @@
 
 ## Background
 
+_For an overview of Logos, see the `getting_started` Livebook._
+
 The problem of reversing a list is a simple, but illustrative demonstration of the 
-expressive power and practical considerations of logic programming. To lay the conceptual 
-and concrete groundwork for a solution in Logos, it makes sense to first develop a 
-solution in pure Elixir. For both the Elixir and Logos implementations, two different 
-recursive algorithms will be presented. One approach is straightforward, but relatively 
-inefficient. The second algorithm makes use of an accumulator and is a more 
+expressiveness of logic programming, as well as certain practical considerations. 
+To lay the conceptual and concrete groundwork for a solution in Logos, it makes sense 
+to first develop a solution in pure Elixir. For both the Elixir and Logos implementations, 
+two different recursive algorithms will be presented. One approach is straightforward, 
+but relatively inefficient. The second algorithm makes use of an accumulator and is a more 
 computationally efficient strategy.
 
 ## Elixir solution
@@ -307,6 +309,8 @@ end
 ```
 
 ## Interminable problems
+
+**WIP**
 
 Check the call stack for take(1) for the naive and accumulated versions.
 
