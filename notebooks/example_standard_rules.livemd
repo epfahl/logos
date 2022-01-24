@@ -1,39 +1,246 @@
 # Standard rules
 
-## Backbround
+## Background
 
 Before exploring more complex applications of Logos, it's instructive to see how the
 rules made available with `use Logos` are constructed, specifically how more sophisticated
-rulres are composed from simpler rules. For a primer on Logos syntax, see the 
-`getting_started` Livebook.
-
-... all of the code below will be defined in Markdown; not runnable...
+rulres are composed from simpler rules. 
+For a primer on Logos syntax, see the `getting_started` Livebook.
 
 Rules in Logos are defined with the macro `defrule`. Like `def` for defining ordinary Elixir
-functions, `defrule` can only be use inside of a module. For the sake of brevity and
+functions, `defrule` can only be use inside of a module. 
+For the sake of brevity and
 readability, module definitions will be omitted in what follows.
 
-## The empty list
+Following each rule, multiple exmaples will be shown to illustrate its basic usage. 
+For these examples to work, it is first necessary to import the Logos "standard library":
 
-A rule expressing that a list `l` is an empty list is as simple as it sounds. Recall that 
-in Logos, equality of terms `x` and `y` is written as `equal(x, y)`. It follows that equality
-of a term `l` and the empty list is written as `equal(l, [])`. Note that `[]`--the empty list 
-in Elixir--is a valid Logos term. The rule definition for an empty list is then
+```elixir
+use Logos
+```
+
+## Empty list
+
+A rule expressing that a list `l` is an empty list is as simple as it sounds. 
+In Elixir, a variable is matched with an empty list via `l = []` or `[] = l` 
+(if `l` is already defined).
+Recall that in Logos, relational equality (or _unification_) of terms `x` and `y` 
+is written as `equal(x, y)`. 
+It follows that equality of a term `l` and the empty list is written as `equal(l, [])` 
+or `equal([], l)`; the result is independent of the order of arguments in `equal`.
+Note that `[]`--the empty list in Elixir--is a valid Logos term. 
+The rule definition for an empty list is then
 
 <!-- livebook:{"force_markdown":true} -->
 
 ```elixir
 defrule empty(l) do
-  empty(l, [])
+  equal(l, [])
 end
 ```
 
-## The head and tail of a list
+<!-- livebook:{"break_markdown":true} -->
 
-## The head of a list
+Examples:
 
-## The tail of a list
+```elixir
+ask [l] do
+  empty([])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "empty list")
 
-## A proper list
+ask [l] do
+  empty(1)
+end
+|> Enum.to_list()
+|> IO.inspect(label: "nonempty list failure")
+```
+
+## Head and tail of a list
+
+Let's create a rule in Logos, which we'll call `prepend`, that is analogous to the 
+Elixir expression `[h | t] = l` for nonempty list `l`. 
+This expression extracts the head `h` and tail `t` of the list.
+Similarly, if `h` and `t` are known, `l = [h | t]` creates a list.
+The corresponding Logos rule has 3 arguments, `(h, t, l)` and can perform both 
+destructuring of a given list and construction of a new list. 
+This forward-backward duality is a hallmark of relational expressions.
+Similar to `empty`, the definition of `prepend` is a direct translation from Elixir:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defrule prepend(h, t, l) do
+  equal([h | t], l)
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Examples:
+
+```elixir
+ask [h, t] do
+  prepend(h, t, [1, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple destructuring")
+
+ask [l] do
+  prepend(1, [2, 3], l)
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple construction")
+
+ask [h, x] do
+  prepend(h, [x, 3], [1, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "inference")
+
+ask [h, t] do
+  prepend(h, t, [])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "construction failure")
+```
+
+## Head of a list
+
+In a sense, `prepend` defines the head and tail of a nonempty list. 
+How can we use `prepend` to define a rule, `head`, that relates a list `l` to its head `h`?
+Note that there is some tail `t` for which `prepend(h, t, l)`.
+Even though `t` isn't an argument of `head`, it must be defined in the rule body.
+New variables are injected into a relational expression with `with_vars`.
+The resulting definition of `head` is given by
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defrule head(h, l) do
+  with_vars [t] do
+    prepend(h, t, l)
+  end
+end
+```
+
+The body of the rule can be read in words as, "Given `h` and `l`, there is some 
+`t`, representing the tail of `l`, such that `prepend(h, t, l)` is satisfied.
+
+<!-- livebook:{"break_markdown":true} -->
+
+Examples:
+
+```elixir
+ask [h] do
+  head(h, [1, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple destructuring")
+
+ask [x] do
+  head(1, [x, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple inference")
+
+ask [x] do
+  head(1, [])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple inference failure")
+```
+
+## Tail of a list
+
+The rule for `tail` that relates a list `l` to its tail `t` is very similar to `head`:
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defrule tail(t, l) do
+  with_vars [h] do
+    prepend(h, t, l)
+  end
+end
+```
+
+<!-- livebook:{"break_markdown":true} -->
+
+Examples:
+
+```elixir
+ask [t] do
+  tail(t, [1, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple destructuring")
+
+ask [x] do
+  tail([2, 3], [1, x, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "simple inference")
+```
+
+## List
+
+The above relations effectively define the structure of a list. 
+But what is a list and how is this expressed in Logos?
+Lists in Elixir are _linked lists_, which are defined recursively. 
+A linked list can either be the empty list `[]`, or it can be constructed as `[h | t]`,
+where the tail is a list.
+The body of a `list` rule must have two branches, one that succeeds if the list is empty,
+and another that succeeds if the tail is a list.
+
+In Logos, expressions for multiple logical
+branches (_or_ logic) are separated by a space, while expresssions that must be jointly
+satisfied (_and_ logic) are present in a list. The `list` rule can be encoded as
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defrule list(l) do
+  empty(l)
+
+  with_vars [t] do
+    [tail(t, l), list(t)]
+  end
+end
+```
+
+In words, this can be read as, "If `l` is a list, it is either an empty list or there 
+is some `t` that is the tail of `l` and which is itself a list."
+
+<!-- livebook:{"break_markdown":true} -->
+
+Examples:
+
+```elixir
+ask [l] do
+  list([1, 2, 3])
+end
+|> Enum.to_list()
+|> IO.inspect(label: "success")
+
+ask [l] do
+  list(1)
+end
+|> Enum.to_list()
+|> IO.inspect(label: "failure")
+
+ask [x] do
+  list([1, 2 | x])
+end
+|> Enum.take(5)
+|> IO.inspect(label: "inference")
+```
+
+## List membership
+
+... proper vs improper...
 
 ## List concatenation
+
+

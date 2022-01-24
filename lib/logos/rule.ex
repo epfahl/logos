@@ -61,7 +61,7 @@ defmodule Logos.Rule do
   """
   defrule head(h, l) do
     with_vars [t] do
-      equal([h | t], l)
+      prepend(h, t, l)
     end
   end
 
@@ -79,7 +79,7 @@ defmodule Logos.Rule do
   """
   defrule tail(t, l) do
     with_vars [h] do
-      equal([h | t], l)
+      prepend(h, t, l)
     end
   end
 
@@ -90,23 +90,23 @@ defmodule Logos.Rule do
 
     iex> use Logos
     iex> ask [x] do
-    ...>   proper_list([1, 2])
+    ...>   list([1, 2])
     ...> end
     ...> |> Enum.to_list()
     ...> [[:_0]]   # success
 
     iex> use Logos
     iex> ask [x] do
-    ...>   proper_list([1 | 2])
+    ...>   list([1 | 2])
     ...> end
     ...> |> Enum.to_list()
     ...> []   # failure
   """
-  defrule proper_list(l) do
+  defrule list(l) do
     empty(l)
 
     with_vars [t] do
-      [tail(t, l), proper_list(t)]
+      [tail(t, l), list(t)]
     end
   end
 
@@ -125,7 +125,7 @@ defmodule Logos.Rule do
     [
       head(x, l),
       with_vars [t] do
-        [tail(t, l), proper_list(t)]
+        [tail(t, l), list(t)]
       end
     ]
 
