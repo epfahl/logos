@@ -1,0 +1,39 @@
+# Standard rules
+
+## Backbround
+
+Before exploring more complex applications of Logos, it's instructive to see how the
+rules made available with `use Logos` are constructed, specifically how more sophisticated
+rulres are composed from simpler rules. For a primer on Logos syntax, see the 
+`getting_started` Livebook.
+
+... all of the code below will be defined in Markdown; not runnable...
+
+Rules in Logos are defined with the macro `defrule`. Like `def` for defining ordinary Elixir
+functions, `defrule` can only be use inside of a module. For the sake of brevity and
+readability, module definitions will be omitted in what follows.
+
+## The empty list
+
+A rule expressing that a list `l` is an empty list is as simple as it sounds. Recall that 
+in Logos, equality of terms `x` and `y` is written as `equal(x, y)`. It follows that equality
+of a term `l` and the empty list is written as `equal(l, [])`. Note that `[]`--the empty list 
+in Elixir--is a valid Logos term. The rule definition for an empty list is then
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+defrule empty(l) do
+  empty(l, [])
+end
+```
+
+## The head and tail of a list
+
+## The head of a list
+
+## The tail of a list
+
+## A proper list
+
+## List concatenation
