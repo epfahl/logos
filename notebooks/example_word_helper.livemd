@@ -1,0 +1,125 @@
+# Word game helper
+
+## Background
+
+## Words rule
+
+## Three kinds of letters
+
+## The code
+
+```elixir
+defmodule Help do
+  use Logos
+
+  @word_list File.stream!("notebooks/five_letter_words.txt")
+             |> Stream.map(&String.trim/1)
+             |> Enum.to_list()
+
+  def all_words(), do: @word_list
+
+  @doc """
+  Rule that succeeds if `w` is a word in the word list.
+  """
+  defrule word(w) do
+    member(w, @word_list |> Enum.map(&String.graphemes/1))
+  end
+
+  defrule not_member(x, l) do
+    choice do
+      member(x, l) -> failure()
+      success() -> success()
+    end
+  end
+
+  @doc """
+  Get a stream of suggested words that match the given constraints.
+
+  Notes
+  * This would be cleaner if `suggest` were a function and vars were
+    explicitly created with `Var.new` instead of via `with_vars`. And
+    it wouldn't be necessary to `use Logos` in the caller context.
+  """
+  defmacro suggest(word, opts \\ []) when is_binary(word) do
+    {included, excluded} = parse_opts(opts)
+    tokens = tokenize_with_vars(word)
+    vars = extract_vars(tokens)
+
+    quote do
+      stream =
+        ask [w] do
+          with_vars unquote(vars) do
+            [word(w)] ++
+              [equal(w, unquote(tokens))] ++
+              for(l <- unquote(included), do: member(l, w)) ++
+              for(l <- unquote(excluded), do: not_member(l, w))
+          end
+        end
+
+      stream
+      |> Stream.uniq()
+      |> Stream.map(&Enum.join(&1, ""))
+    end
+  end
+
+  defp parse_opts(opts) do
+    included = Keyword.get(opts, :included, [])
+    excluded = Keyword.get(opts, :excluded, [])
+    {included, excluded}
+  end
+
+  defp tokenize_with_vars(word) do
+    word
+    |> String.graphemes()
+    |> Enum.with_index(fn l, i ->
+      case l do
+        "_" -> Macro.var(:"l#{i}", nil)
+        _ -> l
+      end
+    end)
+  end
+
+  defp extract_vars(tokens) do
+    tokens
+    |> Enum.filter(fn t ->
+      case t do
+        {n, _, nil} when is_atom(n) -> true
+        _ -> false
+      end
+    end)
+  end
+end
+
+# give suggest opts that includes `included` and `excluded` letters.
+```
+
+```elixir
+import Help
+use Logos
+
+suggest(
+  "__a__",
+  included: ["k"],
+  excluded: [
+    "i",
+    "r",
+    "t",
+    "e",
+    "p",
+    "l",
+    "i",
+    "d",
+    "g",
+    "o",
+    "l",
+    "s",
+    "q",
+    "u",
+    "y",
+    "n"
+  ]
+)
+|> Enum.take(10)
+```
+
+
