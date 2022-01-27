@@ -241,6 +241,12 @@ end
 
 ... proper vs improper...
 
+Note that there can be a huge performance difference between
+the proper and general versions (allowing improper) of `member`.
+For the proper version, when the item is found at the head of the current list, there is
+an additional recursive step that essentially verifies that the tail is a list. This
+latter step is typically unncessary.
+
 ## List concatenation
 
 
