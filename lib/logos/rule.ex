@@ -111,7 +111,8 @@ defmodule Logos.Rule do
   end
 
   @doc """
-  Rule expressing that element `x` is contained in proper list `l`.
+  Rule expressing that element `x` is contained in list `l`.
+  This rule allows `l` to be an _improper_ list.
 
   ## Examples
     iex> use Logos
@@ -122,12 +123,7 @@ defmodule Logos.Rule do
     [[1]]
   """
   defrule member(x, l) do
-    [
-      head(x, l),
-      with_vars [t] do
-        [tail(t, l), list(t)]
-      end
-    ]
+    head(x, l)
 
     with_vars [t] do
       [tail(t, l), member(x, t)]
