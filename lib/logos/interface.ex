@@ -92,6 +92,7 @@ defmodule Logos.Interface do
   @doc """
   "Impure" relation that evaluates the first consequence whose corresponding condition goal is
   successful. Implicit conjunction is allowed for both the condition and consequence clauses.
+  This is essentially eqivalent to `conda` in miniKanren.
   """
   defmacro choice(do: [clause | other_clauses]) do
     [g_cond, g_cnsq] = choice_goals(clause)
