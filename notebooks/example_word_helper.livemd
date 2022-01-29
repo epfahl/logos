@@ -9,8 +9,47 @@
 ## The code
 
 ```elixir
+defmodule Parse do
+  alias Logos.Variable, as: V
+
+  def parse_excluded("~" <> ls), do: String.graphemes(ls)
+
+  def parse_input(input) do
+    acc_init = %{var_count: 0, tokens: [], not_here: %{}, included: []}
+    input |> List.foldr(acc_init, &reducer/2)
+  end
+
+  def reducer("*", acc) do
+    v = V.new("v#{acc.var_count}")
+
+    %{
+      acc
+      | tokens: [v | acc.tokens],
+        var_count: acc.var_count + 1
+    }
+  end
+
+  def reducer("~" <> ls, acc) do
+    not_here = String.graphemes(ls)
+    v = V.new("v#{acc.var_count}")
+
+    %{
+      acc
+      | tokens: [v | acc.tokens],
+        var_count: acc.var_count + 1,
+        not_here: Map.put(acc.not_here, v, not_here),
+        included: not_here ++ acc.included
+    }
+  end
+
+  def reducer(l, acc) do
+    %{acc | tokens: [l | acc.tokens]}
+  end
+end
+
 defmodule Help do
   use Logos
+  # alias Logos.Variable, as: V
 
   @word_list File.stream!("notebooks/five_letter_words.txt")
              |> Stream.map(&String.trim/1)
@@ -25,6 +64,19 @@ defmodule Help do
     member(w, @word_list |> Enum.map(&String.graphemes/1))
   end
 
+  @doc """
+  Rule that fails if `x` and `y` successfully unify.
+  """
+  defrule not_equal(x, y) do
+    choice do
+      equal(x, y) -> failure()
+      success() -> success()
+    end
+  end
+
+  @doc """
+  Rule that fails if `x` is a member of list `l`.
+  """
   defrule not_member(x, l) do
     choice do
       member(x, l) -> failure()
@@ -32,94 +84,28 @@ defmodule Help do
     end
   end
 
-  @doc """
-  Get a stream of suggested words that match the given constraints.
+  def suggest(input, excluded \\ "") do
+    excl = Parse.parse_excluded(excluded)
 
-  Notes
-  * This would be cleaner if `suggest` were a function and vars were
-    explicitly created with `Var.new` instead of via `with_vars`. And
-    it wouldn't be necessary to `use Logos` in the caller context.
-  """
-  defmacro suggest(word, opts \\ []) when is_binary(word) do
-    {included, excluded} = parse_opts(opts)
-    tokens = tokenize_with_vars(word)
-    vars = extract_vars(tokens)
+    %{
+      tokens: tokens,
+      not_here: not_here,
+      included: included
+    } = Parse.parse_input(input)
 
-    quote do
-      stream =
-        ask [w] do
-          with_vars unquote(vars) do
-            [word(w)] ++
-              [equal(w, unquote(tokens))] ++
-              for(l <- unquote(included), do: member(l, w)) ++
-              for(l <- unquote(excluded), do: not_member(l, w))
-          end
-        end
-
-      stream
-      |> Stream.uniq()
-      |> Stream.map(&Enum.join(&1, ""))
+    # This is where Logos is embedded.
+    ask [w] do
+      [word(w), equal(w, tokens)] ++
+        for(l <- included, do: member(l, w)) ++
+        for({v, ls} <- not_here, do: not_member(v, ls)) ++
+        for(l <- excl, do: not_member(l, w))
     end
-  end
-
-  defp parse_opts(opts) do
-    included = Keyword.get(opts, :included, [])
-    excluded = Keyword.get(opts, :excluded, [])
-    {included, excluded}
-  end
-
-  defp tokenize_with_vars(word) do
-    word
-    |> String.graphemes()
-    |> Enum.with_index(fn l, i ->
-      case l do
-        "_" -> Macro.var(:"l#{i}", nil)
-        _ -> l
-      end
-    end)
-  end
-
-  defp extract_vars(tokens) do
-    tokens
-    |> Enum.filter(fn t ->
-      case t do
-        {n, _, nil} when is_atom(n) -> true
-        _ -> false
-      end
-    end)
+    |> Stream.uniq()
+    |> Stream.map(&Enum.join(&1, ""))
   end
 end
-
-# give suggest opts that includes `included` and `excluded` letters.
 ```
 
 ```elixir
-import Help
-use Logos
 
-suggest(
-  "__a__",
-  included: ["k"],
-  excluded: [
-    "i",
-    "r",
-    "t",
-    "e",
-    "p",
-    "l",
-    "i",
-    "d",
-    "g",
-    "o",
-    "l",
-    "s",
-    "q",
-    "u",
-    "y",
-    "n"
-  ]
-)
-|> Enum.take(10)
 ```
-
-
