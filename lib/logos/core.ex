@@ -95,4 +95,15 @@ defmodule Logos.Core do
   defp do_switch(state, stream, g_conc, g_alt) when is_function(stream) do
     fn -> do_switch(state, stream.(), g_conc, g_alt) end
   end
+
+  @doc """
+  Non-relational _negation as failure_ that effectively negates a single goal.
+
+  WARNING: Experimental.
+  """
+  def negate(goal) do
+    fn %S{} = state ->
+      switch(goal, failure(), success()).(state)
+    end
+  end
 end

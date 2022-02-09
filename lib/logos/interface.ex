@@ -120,4 +120,18 @@ defmodule Logos.Interface do
 
   # Extract the condition and consequence goals from a quoted line in the choice macro
   defp choice_goals({:->, _, [[g_cond], g_cnsq]}), do: [g_cond, g_cnsq]
+
+  @doc """
+  Implementation of _negation as failure_ using the `choice` relation.
+
+  WARNING: Experimental.
+  """
+  defmacro neg(do: clauses) do
+    quote do
+      I.choice do
+        unquote(clauses) -> failure()
+        success() -> success()
+      end
+    end
+  end
 end
