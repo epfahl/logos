@@ -261,4 +261,4 @@ end
 
 # Where to go from here?
 
-The `/notebooks` directory has a number of Livebooks that go deeper into the implementation of specific rules, as well as applications of Logos.
+The `/notebooks` directory has a number of Livebooks that go deeper into the implementation of specific rules and applications of Logos.
