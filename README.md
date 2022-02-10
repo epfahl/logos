@@ -10,7 +10,7 @@ This library grew out of a general interest in logic programming and its potenti
 
 _Why now?_
 
-_Why Elixir_
+_Why Elixir_?
 
 _What's different?_
 
