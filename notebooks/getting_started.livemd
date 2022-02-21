@@ -56,8 +56,14 @@ _What are the applications?_
 
 ## Quick start
 
-To get started with Logos right away, type `use Logos` at the head of a module or in a 
-Livebook session.
+To get started with right away, first install the Logos package as a `mix` dependency. 
+For a Livebook, use `Mix.install`:
+
+```elixir
+Mix.install([{:logos, git: "https://github.com/epfahl/logos.git"}])
+```
+
+Now type `use Logos` at the head of a module or in a Livebook session.
 
 ```elixir
 use Logos

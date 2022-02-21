@@ -16,6 +16,10 @@ Following each rule, multiple exmaples will be shown to illustrate its basic usa
 For these examples to work, it is first necessary to import the Logos "standard library":
 
 ```elixir
+Mix.install([{:logos, git: "https://github.com/epfahl/logos.git"}])
+```
+
+```elixir
 use Logos
 ```
 

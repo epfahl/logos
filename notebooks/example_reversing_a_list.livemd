@@ -12,6 +12,12 @@ two different recursive algorithms will be presented. One approach is straightfo
 but relatively inefficient. The second algorithm makes use of an accumulator and is a more 
 computationally efficient strategy.
 
+Let's install Logos for later use:
+
+```elixir
+Mix.install([{:logos, git: "https://github.com/epfahl/logos.git"}])
+```
+
 ## Elixir solution
 
 ```elixir
