@@ -248,5 +248,3 @@ an additional recursive step that essentially verifies that the tail is a list. 
 latter step is typically unncessary.
 
 ## List concatenation
-
-

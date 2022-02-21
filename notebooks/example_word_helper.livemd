@@ -2,54 +2,204 @@
 
 ## Background
 
+2022-2-21 Notes
+
+Instead of Wordle per se as a public facing documented example maybe just do a 
+constrained word search. Start with a small dictionary say that certain letters are 
+included or excluded some letters or have known positions.  How would we encode 
+letters that appear more than once or exactly twice. What are other problems that 
+have the same shape as a constrained word search? How difficult would this be to 
+generalize for words of different lengths?
+
+Replace wordle example with a 5-digit code
+
+This is an example of a pretty general query problem, the kind of simple problem we 
+could use to understand queries and search.
+
+Replace the public-facing wordle example with "guess the N digit code!" N = 3, 4, or 5?
+
+d_i (digit in ith position) in 0..9, encoded as explicit list of digits
+
+Maybe a good example to use if finite domains are included?
+
+_Consider making all livebooks standalone by explicitly using `Mix.install`_
+
+WIP
+
+When presenting this, start with, and showcase, the logical core of the problem. This is
+where Logos shines. The rest is the user interface--nontrivial, but someone incidental.
+
+And make implicit ideas explicit. While it may be "obvious" that each solution cell can
+be associated with only one letter value, this has to expressed explicitly when writing
+the code.
+
+The goal is to constrain the solution as much as possible, consistent with the game state.
+
+Note that I have chosen a particular boundary between the host language and Logos. That
+boundary could be pushed further in favor of Logos, allowing it to handle even the 
+interface.
+
+The goal of this exercise is to provide solutions that are logically consistent with
+with the game state. With a focus on logical consistency and clarity, the approach outlined
+here is probably not the most efficient in terms of search run time.
+
+Is it precise to say that `yellow` implies that the letter occupies at least one position
+elsewhere in the word?
+
+It might be useful to crafts some tests using an artificial dict and game states to 
+exercise some of the subtle logic.
+
+What I've come to realize is that Wordle is first and foremost a logical exercise. The
+solution space is obtained by logically constraining the dictionary. Any stastical
+arguments are applied in the choice of the word from the solution space. This choice
+is most evident with the first choice, where the entire dictionary is available. A good
+choice from the list of candidate solutions is one that has the potential to most tightly
+constrain the solution space--produce the smallest set of options consistent with the
+current game state. The first choice is the case where there are no prior constraints. But 
+what statistical principles apply to that first choice? We'd like to guess the word
+immediately. In general, we want to find the correct word in the smallest number of steps.
+The only overall prior is that a word is selected uniformly at random from the dict 
+(with or withour replacement?). Given this, what's the first word that, on average, most
+tightly constraints solution space? Letter and possibly n-gram freqs play a role.
+
 ## Words rule
 
 ## Three kinds of letters
 
-## The code
+## The logic
+
+## The interface
+
+## The complete code
 
 ```elixir
-defmodule Parse do
+# The game reuction is still not quite right. Row and column information are
+# not independent. Wondering if it's simpler or more elegant to let every letter position
+# be a var, and then supplying constraints for each var, individually and in 
+# aggregate?
+
+defmodule Interface do
   alias Logos.Variable, as: V
 
-  def parse_excluded("~" <> ls), do: String.graphemes(ls)
+  @split_char "."
 
+  @doc """
+  Parse the input into a fully reduced form that will be interpreted as the logical
+  game state.
+  """
   def parse_input(input) do
-    acc_init = %{var_count: 0, tokens: [], not_here: %{}, included: []}
-    input |> List.foldr(acc_init, &reducer/2)
+    input
+    |> lines()
+    |> Enum.map(&parse_line/1)
+    |> reduce_game()
   end
 
-  def reducer("*", acc) do
+  @doc """
+  Split the input string into a list of lines.
+  """
+  def lines(input) do
+    input
+    |> String.trim()
+    |> String.split("\n")
+  end
+
+  @doc """
+  Parse and individual line to a list of maps containing the letter entry
+  and state for each cell.
+  """
+  def parse_line(line) do
+    line
+    |> String.trim()
+    |> String.split(" ")
+    |> Enum.map(&parse_cell/1)
+  end
+
+  @doc """
+  Parse each string cell to the tuple {letter, state}, where state is one of
+  """
+  def parse_cell(cell) do
+    [letter, state] = cell |> String.split(@split_char)
+    {atom_state(state), String.downcase(letter)}
+  end
+
+  # Convert the string cell state to a more descriptive atom.
+  defp atom_state("b"), do: :excluded
+  defp atom_state("y"), do: :hint
+  defp atom_state("g"), do: :match
+
+  @doc """
+  Reduce the complete game state to a form that can be interpreted logically.
+  """
+  def reduce_game(parsed_rows) do
+    acc_init = %{var_count: 0, vars: [], word: [], var_to_hints: %{}, excluded: []}
+
+    reduced_game =
+      parsed_rows
+      |> transpose()
+      |> Enum.map(&reduce_column/1)
+      |> List.foldr(acc_init, &reducer_game/2)
+      |> Map.delete(:var_count)
+
+    included = reduced_game.var_to_hints |> Map.values() |> List.flatten()
+
+    excluded =
+      MapSet.difference(
+        MapSet.new(reduced_game.excluded),
+        MapSet.new(included)
+      )
+      |> MapSet.to_list()
+
+    %{reduced_game | excluded: excluded}
+  end
+
+  @doc """
+  Transpose the list of tuples representing each line (row) to a list of columns.
+  """
+  def transpose(rows) do
+    rows
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
+  end
+
+  @doc """
+  Reduce a single column of game cells to the set letter (if available), the list
+  of pushed letters, and the list of excluded letters.
+  """
+  def reduce_column(col) do
+    acc_init = %{match: nil, hint: [], excluded: []}
+    Enum.reduce(col, acc_init, &reducer_column/2)
+  end
+
+  defp reducer_column({:match, l}, acc), do: %{acc | match: l}
+  defp reducer_column({:hint, l}, acc), do: %{acc | hint: [l | acc.hint]}
+  defp reducer_column({:excluded, l}, acc), do: %{acc | excluded: [l | acc.excluded]}
+
+  defp reducer_game(%{excluded: es, match: l, hint: hs}, acc) do
+    acc = reducer_game_helper(l, hs, acc)
+    %{acc | excluded: es ++ acc.excluded}
+  end
+
+  defp reducer_game_helper(nil, hs, acc) do
     v = V.new("v#{acc.var_count}")
 
     %{
       acc
-      | tokens: [v | acc.tokens],
-        var_count: acc.var_count + 1
-    }
-  end
-
-  def reducer("~" <> ls, acc) do
-    not_here = String.graphemes(ls)
-    v = V.new("v#{acc.var_count}")
-
-    %{
-      acc
-      | tokens: [v | acc.tokens],
+      | word: [v | acc.word],
+        vars: [v | acc.vars],
         var_count: acc.var_count + 1,
-        not_here: Map.put(acc.not_here, v, not_here),
-        included: not_here ++ acc.included
+        var_to_hints: Map.put(acc.var_to_hints, v, hs)
     }
   end
 
-  def reducer(l, acc) do
-    %{acc | tokens: [l | acc.tokens]}
+  defp reducer_game_helper(l, _ps, acc) when is_binary(l) do
+    %{acc | word: [l | acc.word]}
   end
 end
+```
 
-defmodule Help do
+```elixir
+defmodule Assistant do
   use Logos
-  # alias Logos.Variable, as: V
 
   @word_list File.stream!("notebooks/five_letter_words.txt")
              |> Stream.map(&String.trim/1)
@@ -65,40 +215,38 @@ defmodule Help do
   end
 
   @doc """
-  Rule that fails if `x` and `y` successfully unify.
+  Returns a goal that fails if `x` is a member of list `l`.
   """
-  defrule not_equal(x, y) do
-    choice do
-      equal(x, y) -> failure()
-      success() -> success()
-    end
+  def not_member(x, l) do
+    negate(member(x, l))
   end
 
   @doc """
-  Rule that fails if `x` is a member of list `l`.
+  Given a map from variables to pusehd letters, return the full list of letters included 
+  in the word, but with unknown positions.
   """
-  defrule not_member(x, l) do
-    choice do
-      member(x, l) -> failure()
-      success() -> success()
-    end
+  def included_letters(var_to_hints) do
+    var_to_hints
+    |> Map.values()
+    |> List.flatten()
   end
 
-  def suggest(input, excluded \\ "") do
-    excl = Parse.parse_excluded(excluded)
-
+  def suggest(input) do
     %{
-      tokens: tokens,
-      not_here: not_here,
-      included: included
-    } = Parse.parse_input(input)
+      word: word,
+      vars: vars,
+      var_to_hints: var_to_hints,
+      excluded: excluded
+    } = Interface.parse_input(input)
+
+    included = included_letters(var_to_hints)
 
     # This is where Logos is embedded.
     ask [w] do
-      [word(w), equal(w, tokens)] ++
+      [word(w), equal(w, word)] ++
         for(l <- included, do: member(l, w)) ++
-        for({v, ls} <- not_here, do: not_member(v, ls)) ++
-        for(l <- excl, do: not_member(l, w))
+        for({v, ls} <- var_to_hints, do: not_member(v, ls)) ++
+        for(l <- excluded, do: not_member(l, vars))
     end
     |> Stream.uniq()
     |> Stream.map(&Enum.join(&1, ""))
@@ -107,5 +255,92 @@ end
 ```
 
 ```elixir
+import Assistant
 
+input = """
+O.b R.y A.y T.y E.b
+T.y A.y P.b I.b R.y
+R.y A.b S.b T.y A.g
+A.b T.y R.y I.b A.g
+"""
+
+suggest(input)
+|> Enum.take(1)
 ```
+
+```elixir
+import Interface
+
+"""
+B.b O.b R.b E.b D.b
+W.b H.b I.b C.b H.b
+G.b L.b A.g S.y S.b
+S.g T.g A.g M.b P.b
+"""
+|> lines()
+|> Enum.map(&parse_line/1)
+
+# |> transpose()
+```
+
+All positions correspond to distinct, named variables, and each variable has different
+constraints applied.
+
+A match is a single equality constraint between that letter and the 
+associated var.
+
+A hint means the letter is in the word, but it's not associated with the var
+for which the hint is indicated.
+
+Excluded means
+
+A letter for which there is a hint and an excluded in the same row means that the 
+letter appears only once in the word, but not in the hint or excluded positions. How do
+we express "only once" logically? This is a significant constraint? Can this be expressed
+implicitly through the assembly of other rules?
+
+```elixir
+alias Logos.Variable, as: V
+
+vars = 1..5 |> Enum.map(fn n -> V.new("v#{n}") end)
+```
+
+v1 not in [p, m], m in word
+
+v2 not in [l, e]
+
+v3 not in [a, r], r in word
+
+v4 not in [n, r]
+
+v5 not in [t, y]
+
+I think this is necessary and sufficient for this game state. I don't think there needs to
+be a global notion of _excluded_ letters. And because of the subtlety of positionally
+excluded letter that _are_ present in the word, this local approach means we don't have 
+any conflicts that need to be reconciled.
+
+If a cell is `green`, then the "not in" is superceded, but the "in" list remains, because
+it refers to guaranteed membership elsewhere in the word (letter in word).
+
+... So, not quite...
+
+When a letter is _excluded_ from a position (not a _hint_), that is stronger than just
+not being included at that position. It also says that the letter is at no other position,
+as long as the letter isn't currently hinted in the same row. So, same conflict issue.
+
+The purely local constraints above are consistent, but do not use all the information,
+resulting in a search space that is larger than the fully constrained search space.
+
+Maybe the key is here:
+
+v3 not in [a, r], r in word
+
+r is globally excluded only if it is not a hint. What if the letter in question is also
+matched to a location?
+
+A var can be _matched_ to a letter or it can be constrained by exclusion (not in list of 
+letters). A tuple construct that contains these states?
+
+I think I want a map from a letter to the variables that are not equal to that letter--a
+map of exclusion.

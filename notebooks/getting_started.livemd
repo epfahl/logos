@@ -28,7 +28,7 @@ well as notes on specific design choices and possible areas for future improveme
 
 _Why now?_
 
-_Why Elixir_
+_Why Elixir_?
 
 _What's different?_
 
