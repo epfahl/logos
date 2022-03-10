@@ -93,7 +93,7 @@ end
 
 The result is an empty stream, meaning that there is no state for which the goal is true.
 
-Several specialized words are used above and in what follows, and it's important to have some early appreciation of their meanings. A _rule_ expresses a logical relationship among _terms_. A _term_ can be a variable or a constant (number, string, or atom), or a list of variables and constants. The equivalence _rule_ is expressed as `equal(x, y)`, where `x`and `y` are any two _terms_. When `x` is a variable and `y` is set to the constant 1, `equal(x, 1)` is a logical _goal_ asserting that the variable `x` is equal to 1. When a goal is wrapped with `ask`, that goal is posed as a _query_ for we'd like answer.
+Several specialized words are used above and in what follows, and it's important to have some early appreciation of their meanings. A _rule_ expresses a logical relationship among _terms_. A _term_ can be a variable, a constant (number, string, or atom), or a list of terms (yep, a term is defined recursively). The equivalence _rule_ is expressed as `equal(x, y)`, where `x`and `y` are any two _terms_. When `x` is a variable and `y` is set to the constant 1, `equal(x, 1)` is a logical _goal_ asserting that the variable `x` is equal to 1. When a goal is wrapped with `ask`, that goal is posed as a _query_ for we'd like answer.
 
 To show that `equal` works for list terms, find `x` and `y` in the following query:
 
