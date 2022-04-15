@@ -15,6 +15,22 @@ defmodule Logos.DelayedList do
   def single(x), do: [x]
 
   @doc """
+  Binary version of interleave. Using the miniK name for now.
+  """
+  def mplus([], dl2), do: dl2
+  def mplus([h1 | t1], dl2), do: [h1 | fn -> mplus(dl2, t1) end]
+  def mplus(dl1, dl2) when is_function(dl1, 0), do: fn -> mplus(dl2, dl1.()) end
+
+  @doc """
+  Binary versio of flat_map. Using the miniK name for now.
+  """
+  def bind([], _mapper), do: []
+
+  # pause/delay should go here
+  def bind([h | t], mapper), do: mplus(fn -> mapper.(h) end, fn -> bind(t, mapper) end)
+  def bind(dl, mapper) when is_function(dl, 0), do: fn -> bind(dl.(), mapper) end
+
+  @doc """
   Interleave a pair of delayed lists.
 
   This is similar to `mplus` in µKanren.
