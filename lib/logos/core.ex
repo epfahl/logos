@@ -9,7 +9,7 @@ defmodule Logos.Core do
   alias Logos.DelayedList, as: D
 
   @doc """
-  Return a goal that leaves the state unaltered and lifts it into a delayed list.
+  Return a goal that leaves the state unaltersed and lifts it into a delayed list.
   """
   def success(), do: fn state -> D.single(state) end
 
@@ -143,32 +143,4 @@ defmodule Logos.Core do
   Call a goal on an empty state and return the result as an Elixir Stream.
   """
   def call_on_empty(goal), do: goal.(S.empty()) |> D.to_stream()
-
-  @doc """
-  Non-relational if-then-else rule. If the _condition_ goal succeeds, the _conclusion_ goal is
-  pursued; otherwise, the _alternative_ goal is pursued.
-  """
-  def switch(goal_cond, goal_conc, goal_alt) do
-    fn %S{} = state ->
-      do_switch(state, goal_cond.(state), goal_conc, goal_alt)
-    end
-  end
-
-  defp do_switch(_state, [_h | _t] = stream, g_conc, _g_else), do: D.flat_map(stream, g_conc)
-  defp do_switch(state, [], _g_conc, g_alt), do: g_alt.(state)
-
-  defp do_switch(state, stream, g_conc, g_alt) when is_function(stream) do
-    fn -> do_switch(state, stream.(), g_conc, g_alt) end
-  end
-
-  @doc """
-  Non-relational _negation as failure_ that effectively negates a single goal.
-
-  WARNING: Experimental.
-  """
-  def negate(goal) do
-    fn %S{} = state ->
-      switch(goal, failure(), success()).(state)
-    end
-  end
 end

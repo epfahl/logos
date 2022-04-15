@@ -4,6 +4,7 @@ defmodule Logos.Interface do
   """
 
   alias Logos.Core, as: C
+  alias Logos.CoreNonRel, as: CNR
   alias Logos.Variable, as: V
   alias Logos.Presentation, as: P
   alias Logos.Interface, as: I
@@ -90,7 +91,7 @@ defmodule Logos.Interface do
   end
 
   @doc """
-  "Impure" relation that evaluates the first consequence whose corresponding condition goal is
+  Non-relational rule that evaluates the first consequence whose corresponding condition goal is
   successful. Implicit conjunction is allowed for both the condition and consequence clauses.
   This is essentially eqivalent to `conda` in miniKanren.
   """
@@ -110,7 +111,7 @@ defmodule Logos.Interface do
 
   defp do_choice(g_cond, g_cnsq, [_h | _t] = clauses) do
     quote do
-      C.switch(
+      CNR.switch(
         I.implicit_all(unquote(g_cond)),
         I.implicit_all(unquote(g_cnsq)),
         I.choice(do: unquote(clauses))
