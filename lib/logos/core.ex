@@ -171,4 +171,22 @@ defmodule Logos.Core do
       switch(goal, failure(), success()).(state)
     end
   end
+
+  def gt(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.>/2)
+  def lt(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.</2)
+  def gte(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.>=/2)
+  def lte(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.<=/2)
+
+  defp nonrel_inequality(term1, term2, op) when is_function(op) do
+    fn %S{} = state ->
+      term1_walked = S.walk(state, term1)
+      term2_walked = S.walk(state, term2)
+
+      if op.(term1_walked, term2_walked) do
+        D.single(state)
+      else
+        D.empty()
+      end
+    end
+  end
 end
