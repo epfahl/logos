@@ -1,3 +1,5 @@
+WARNING: This is very much a work in progress! Expect missing, incomplete, or inconsistent code, tests, and documentation. 
+
 # What is Logos?
 
 **Logos: The Greek root (λόγοϚ) of the word _logic_.**
