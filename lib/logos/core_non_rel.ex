@@ -62,30 +62,60 @@ defmodule Logos.CoreNonRel do
     iex> both(equal(x, 1), gt(x, 10)) |> call_on_empty() |> Enum.to_list()
     []
   """
-  def gt(term1, term2), do: nonrel_op(term1, term2, &Kernel.>/2)
+  def gt(term1, term2), do: nonrel_bincond(term1, term2, &Kernel.>/2)
 
   @doc """
   Non-relational less than_ (<) for grounded terms.
   """
-  def lt(term1, term2), do: nonrel_op(term1, term2, &Kernel.</2)
+  def lt(term1, term2), do: nonrel_bincond(term1, term2, &Kernel.</2)
 
   @doc """
   Non-relational _greater than or equal_ (>=) for grounded terms.
   """
-  def gte(term1, term2), do: nonrel_op(term1, term2, &Kernel.>=/2)
+  def gte(term1, term2), do: nonrel_bincond(term1, term2, &Kernel.>=/2)
 
   @doc """
   Non-relational _less than or equal_ (<=) for grounded terms.
   """
-  def lte(term1, term2), do: nonrel_op(term1, term2, &Kernel.<=/2)
+  def lte(term1, term2), do: nonrel_bincond(term1, term2, &Kernel.<=/2)
 
   @doc """
   Non-relational syntactic disequality.
   """
-  def neq(term1, term2), do: nonrel_op(term1, term2, &Kernel.!=/2)
+  def neq(term1, term2), do: nonrel_bincond(term1, term2, &Kernel.!=/2)
 
-  # Abstracted implementation of non-relational inequalities.
-  defp nonrel_op(term1, term2, op) when is_function(op) do
+  @doc """
+  Non-relational addition.
+  """
+  def add(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.+/2)
+
+  @doc """
+  Non-relational subtraction.
+  """
+  def sub(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.-/2)
+
+  @doc """
+  Non-relational multiplication.
+  """
+  def mult(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.*/2)
+
+  @doc """
+  Non-relational division.
+  """
+  def div(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.//2)
+
+  @doc """
+  Non-relational list sum.
+  """
+  def sum(term), do: nonrel_unlist(term, &Enum.sum/1)
+
+  @doc """
+  Non-relational list count (length).
+  """
+  def count(term), do: nonrel_unlist(term, &length/1)
+
+  # Abstracted implementation of non-relational binary conditional operations.
+  defp nonrel_bincond(term1, term2, op) when is_function(op) do
     fn %S{} = state ->
       term1_walked = S.walk(state, term1)
       term2_walked = S.walk(state, term2)
@@ -94,6 +124,31 @@ defmodule Logos.CoreNonRel do
         D.single(state)
       else
         D.empty()
+      end
+    end
+  end
+
+  # Abstracted implementation of non-relational binary arithmetic operations.
+  defp nonrel_binarith(term1, term2, op) when is_function(op) do
+    fn %S{} = state ->
+      term1_walked = S.walk(state, term1)
+      term2_walked = S.walk(state, term2)
+
+      case {term1_walked, term2_walked} do
+        {x, y} when is_number(x) and is_number(y) -> op.(x, y)
+        _ -> D.empty()
+      end
+    end
+  end
+
+  # Abstracted implementation of non-relational unary list operations.
+  defp nonrel_unlist(term, op) when is_function(op) do
+    fn %S{} = state ->
+      term_walked = S.walk(state, term)
+
+      case term_walked do
+        l when is_list(l) -> op.(l)
+        _ -> D.empty()
       end
     end
   end
