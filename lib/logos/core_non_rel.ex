@@ -62,25 +62,30 @@ defmodule Logos.CoreNonRel do
     iex> both(equal(x, 1), gt(x, 10)) |> call_on_empty() |> Enum.to_list()
     []
   """
-  def gt(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.>/2)
+  def gt(term1, term2), do: nonrel_op(term1, term2, &Kernel.>/2)
 
   @doc """
   Non-relational less than_ (<) for grounded terms.
   """
-  def lt(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.</2)
+  def lt(term1, term2), do: nonrel_op(term1, term2, &Kernel.</2)
 
   @doc """
   Non-relational _greater than or equal_ (>=) for grounded terms.
   """
-  def gte(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.>=/2)
+  def gte(term1, term2), do: nonrel_op(term1, term2, &Kernel.>=/2)
 
   @doc """
   Non-relational _less than or equal_ (<=) for grounded terms.
   """
-  def lte(term1, term2), do: nonrel_inequality(term1, term2, &Kernel.<=/2)
+  def lte(term1, term2), do: nonrel_op(term1, term2, &Kernel.<=/2)
+
+  @doc """
+  Non-relational syntactic disequality.
+  """
+  def neq(term1, term2), do: nonrel_op(term1, term2, &Kernel.!=/2)
 
   # Abstracted implementation of non-relational inequalities.
-  defp nonrel_inequality(term1, term2, op) when is_function(op) do
+  defp nonrel_op(term1, term2, op) when is_function(op) do
     fn %S{} = state ->
       term1_walked = S.walk(state, term1)
       term2_walked = S.walk(state, term2)
