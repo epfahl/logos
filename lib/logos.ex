@@ -15,12 +15,12 @@ defmodule Logos do
           lte: 2,
           negate: 1,
           neq: 2,
-          add: 2,
-          sub: 2,
-          mult: 2,
-          div: 2,
-          sum: 1,
-          count: 1
+          add: 3,
+          sub: 3,
+          mult: 3,
+          div: 3,
+          sum: 2,
+          count: 2
         ]
 
       import Logos.Interface, only: [ask: 2, choice: 1, defrule: 2, fork: 1, neg: 1, with_vars: 2]

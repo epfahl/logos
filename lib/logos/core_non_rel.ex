@@ -87,32 +87,32 @@ defmodule Logos.CoreNonRel do
   @doc """
   Non-relational addition.
   """
-  def add(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.+/2)
+  def add(term1, term2, result), do: nonrel_binarith(term1, term2, result, &Kernel.+/2)
 
   @doc """
   Non-relational subtraction.
   """
-  def sub(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.-/2)
+  def sub(term1, term2, result), do: nonrel_binarith(term1, term2, result, &Kernel.-/2)
 
   @doc """
   Non-relational multiplication.
   """
-  def mult(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.*/2)
+  def mult(term1, term2, result), do: nonrel_binarith(term1, term2, result, &Kernel.*/2)
 
   @doc """
   Non-relational division.
   """
-  def div(term1, term2), do: nonrel_binarith(term1, term2, &Kernel.//2)
+  def div(term1, term2, result), do: nonrel_binarith(term1, term2, result, &Kernel.//2)
 
   @doc """
   Non-relational list sum.
   """
-  def sum(term), do: nonrel_unlist(term, &Enum.sum/1)
+  def sum(term, result), do: nonrel_unlist(term, result, &Enum.sum/1)
 
   @doc """
   Non-relational list count (length).
   """
-  def count(term), do: nonrel_unlist(term, &length/1)
+  def count(term, result), do: nonrel_unlist(term, result, &length/1)
 
   # Abstracted implementation of non-relational binary conditional operations.
   defp nonrel_bincond(term1, term2, op) when is_function(op) do
@@ -129,25 +129,25 @@ defmodule Logos.CoreNonRel do
   end
 
   # Abstracted implementation of non-relational binary arithmetic operations.
-  defp nonrel_binarith(term1, term2, op) when is_function(op) do
+  defp nonrel_binarith(term1, term2, result, op) when is_function(op) do
     fn %S{} = state ->
       term1_walked = S.walk(state, term1)
       term2_walked = S.walk(state, term2)
 
       case {term1_walked, term2_walked} do
-        {x, y} when is_number(x) and is_number(y) -> op.(x, y)
+        {x, y} when is_number(x) and is_number(y) -> C.equal(result, op.(x, y)).(state)
         _ -> D.empty()
       end
     end
   end
 
   # Abstracted implementation of non-relational unary list operations.
-  defp nonrel_unlist(term, op) when is_function(op) do
+  defp nonrel_unlist(term, result, op) when is_function(op) do
     fn %S{} = state ->
       term_walked = S.walk(state, term)
 
       case term_walked do
-        l when is_list(l) -> op.(l)
+        l when is_list(l) -> C.equal(result, op.(l)).(state)
         _ -> D.empty()
       end
     end
