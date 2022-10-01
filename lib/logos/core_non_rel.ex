@@ -144,7 +144,7 @@ defmodule Logos.CoreNonRel do
   # Abstracted implementation of non-relational unary list operations.
   defp nonrel_unlist(term, result, op) when is_function(op) do
     fn %S{} = state ->
-      term_walked = S.walk(state, term)
+      term_walked = S.walk_deep(state, term)
 
       case term_walked do
         l when is_list(l) -> C.equal(result, op.(l)).(state)
