@@ -24,18 +24,6 @@ each of the modules, functions, and macros is extensive, and includes many usage
 as well as notes on specific design choices and possible areas for future improvement 
 (**WIP note: This is not yet true, but it will be!**).
 
-## Questions (WIP)
-
-_Why now?_
-
-_Why Elixir_?
-
-_What's different?_
-
-_What's new?_
-
-_What are the applications?_
-
 ## A sample of references that influenced this work
 
 [The Reasoned Schemer](https://mitpress.mit.edu/9780262535519/the-reasoned-schemer/)
