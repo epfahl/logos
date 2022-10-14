@@ -92,7 +92,7 @@ defmodule Logos.Core do
   def any([_h | _t] = goals) do
     fn %S{} = state ->
       goals
-      |> Enum.map(fn g -> delay_goal(g).(state) end)
+      |> Enum.map(fn g -> delay(state, g) end)
       |> D.interleave()
     end
   end
@@ -105,7 +105,7 @@ defmodule Logos.Core do
   def all([_h | _t] = goals) do
     Enum.reduce(goals, fn g, acc ->
       fn %S{} = state ->
-        state |> delay_goal(acc).() |> D.flat_map(g)
+        delay(state, acc) |> D.flat_map(g)
       end
     end)
   end
@@ -127,15 +127,6 @@ defmodule Logos.Core do
   def delay(state, goal) do
     fn ->
       goal.(state)
-    end
-  end
-
-  @doc """
-  Return a goal that wraps the given goal in a thunk.
-  """
-  def delay_goal(goal) do
-    fn %S{} = state ->
-      fn -> goal.(state) end
     end
   end
 
