@@ -38,7 +38,7 @@ _What are the applications?_
 
 ## A sample of references that influenced this work
 
-[The Reasoned Schemer](https://mitpress.mit.edu/books/reasoned-schemer)
+[The Reasoned Schemer](https://mitpress.mit.edu/9780262535519/the-reasoned-schemer/)
 
 [µKanren: A Minimal Functional Core for Relational Programming](http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf)
 
