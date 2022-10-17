@@ -1,7 +1,13 @@
 defmodule Logos.DelayedList do
   @moduledoc """
   Functions needed for interacting with a delayed list--a custom stream-like implementation that
-  largely mirrors what is used in miniKanren and µKanren.
+  largely mirrors what is used in miniKanren and microKanren.
+
+  ## Notes
+  - Include type signatures to augment documentation.
+  - This stream implementation may be updated to something that can be explicitly
+    paused and continued.
+      - Maybe even the Enumerable stream implementation...?
   """
   import Logos.DelayedEval
 
@@ -16,18 +22,25 @@ defmodule Logos.DelayedList do
   def single(x), do: [x]
 
   @doc """
-  Binary version of interleave. Using the miniK name for now.
+  Interleave a pair of delayed lists.
   """
-  def mplus([], dl2), do: dl2
-  def mplus([h1 | t1], dl2), do: [h1 | mplus(dl2, t1) |> delay()]
-  def mplus(dl1, dl2) when is_promise(dl1), do: mplus(dl2, force(dl1)) |> delay()
+  def interleave([h1 | t1], dl2), do: [h1 | mplus(dl2, t1) |> delay()]
+  def interleave(dl1, dl2) when is_promise(dl1), do: interleave(dl2, force(dl1)) |> delay()
+  def interleave([], dl2), do: dl2
 
   @doc """
-  Binary version of flat_map. Using the miniK name for now.
+  Apply the `mapper`, a function that returns a delayed list, to each element of a
+  delayed list and return a flat delayed list.
   """
-  def bind([], _mapper), do: []
-  def bind([h | t], mapper), do: mplus(mapper.(h) |> delay(), bind(t, mapper) |> delay())
-  def bind(dl, mapper) when is_promise(dl), do: dl |> force() |> bind(mapper) |> delay()
+  def flat_map([h | t], mapper) do
+    interleave(
+      mapper.(h) |> delay(),
+      flat_map(t, mapper) |> delay()
+    )
+  end
+
+  def flat_map(dl, mapper) when is_promise(dl), do: flat_map(force(dl), mapper) |> delay()
+  def flat_map([], _mapper), do: []
 
   # @doc """
   # Advance the stream until it is a list, a "mature" stream in the language of miniKanren.

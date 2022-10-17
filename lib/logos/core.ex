@@ -62,7 +62,7 @@ defmodule Logos.Core do
   """
   def either(goal1, goal2) do
     fn %S{} = state ->
-      D.mplus(goal1.(state), goal2.(state))
+      D.interleave(goal1.(state), goal2.(state))
     end
   end
 
@@ -82,7 +82,7 @@ defmodule Logos.Core do
   """
   def both(goal1, goal2) do
     fn %S{} = state ->
-      D.bind(goal1.(state), goal2)
+      D.flat_map(goal1.(state), goal2)
     end
   end
 
