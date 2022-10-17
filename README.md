@@ -5,10 +5,10 @@ WARNING: This is very much a work in progress! Expect missing, incomplete, or in
 **Logos: The Greek root (λόγοϚ) of the word _logic_.**
 
 `Logos` is a relatively small Elixir-hosted _relational_ programming language adapted from 
-miniKanren and µKanren. An attempt was made to create an interface that looks like idiomatic 
+miniKanren and microKanren. An attempt was made to create an interface that looks like idiomatic 
 Elixir and feels approachable to someone who has no experience with relational programming 
 beyond Elixir pattern matching. Many of the core concepts and implementation details were 
-adopted directly from the book, _The Reasoned Schemer_, and the µKanren paper (see 
+adopted directly from the book, _The Reasoned Schemer_, and the microKanren paper (see 
 references below). However, many function names have been updated, either to be more 
 descriptive and memorable, or due to Elixir conventions. Also, to enhance the user 
 experience in Elixir, some of the relational primitives in `Logos` differ in structure from 
@@ -18,7 +18,7 @@ This library grew out of a general interest in logic programming and its potenti
 applications to software-based products. Because usage and extension of `Logos` are key 
 design considerations, the library is broken into modules that reflect the different 
 implementation concerns, including unification, a purely functional core reminiscent of 
-µKanren, and a collection of macros that make up the main user interface. It is hoped 
+microKanren, and a collection of macros that make up the main user interface. It is hoped 
 that `Logos` can be applied, adapted, and grown with relative ease. Documentation for 
 each of the modules, functions, and macros is extensive, and includes many usage examples, 
 as well as notes on specific design choices and possible areas for future improvement 
@@ -28,7 +28,7 @@ as well as notes on specific design choices and possible areas for future improv
 
 [The Reasoned Schemer](https://mitpress.mit.edu/9780262535519/the-reasoned-schemer/)
 
-[µKanren: A Minimal Functional Core for Relational Programming](http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf)
+[microKanren: A Minimal Functional Core for Relational Programming](http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf)
 
 [The Art of Prolog](https://mitpress.mit.edu/books/art-prolog-second-edition)
 
