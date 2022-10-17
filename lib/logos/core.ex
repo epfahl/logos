@@ -1,6 +1,9 @@
 defmodule Logos.Core do
   @moduledoc """
   Primitive relations and helpers.
+
+  This is essentially the microKanren functional core, supplemented with list forms `any`
+  and `all` and helper functions.
   """
 
   alias Logos.Unification, as: U
@@ -11,12 +14,12 @@ defmodule Logos.Core do
   @doc """
   Return a goal that leaves the state unaltersed and lifts it into a delayed list.
   """
-  def success(), do: fn state -> D.single(state) end
+  def success(), do: fn %S{} = state -> D.single(state) end
 
   @doc """
   Return a goal that yields an empty delayed list.
   """
-  def failure(), do: fn _state -> D.empty() end
+  def failure(), do: fn %S{} = _state -> D.empty() end
 
   @doc """
   Return a goal that attempts to unify a pair of terms.
@@ -59,10 +62,7 @@ defmodule Logos.Core do
   """
   def either(goal1, goal2) do
     fn %S{} = state ->
-      D.mplus(
-        delay(state, goal1),
-        delay(state, goal2)
-      )
+      D.mplus(goal1.(state), goal2.(state))
     end
   end
 
@@ -82,56 +82,35 @@ defmodule Logos.Core do
   """
   def both(goal1, goal2) do
     fn %S{} = state ->
-      D.bind(delay(state, goal1), goal2)
+      D.bind(goal1.(state), goal2)
     end
   end
 
   @doc """
   Return a goal that represents disjunction over zero or more goals.
   """
-  def any([_h | _t] = goals) do
-    fn %S{} = state ->
-      goals
-      |> Enum.map(fn g -> delay(state, g) end)
-      |> D.interleave()
-    end
-  end
-
   def any([]), do: failure()
+  def any([goal]), do: goal
+  def any([goal | t]), do: either(goal, any(t))
 
   @doc """
   Return a goal that represents conjunction over zero or more goals.
   """
-  def all([_h | _t] = goals) do
-    Enum.reduce(goals, fn g, acc ->
-      fn %S{} = state ->
-        delay(state, acc) |> D.flat_map(g)
-      end
-    end)
-  end
-
   def all([]), do: success()
+  def all([goal]), do: goal
+  def all([goal | t]), do: both(goal, all(t))
 
   @doc """
   Return a goal that injects a new variable into a function-wrapped goal.
   """
   def with_var(var_to_goal) when is_function(var_to_goal, 1) do
-    fn %S{count: c} = state ->
-      state |> S.inc_count() |> var_to_goal.(V.new(c)).()
-    end
-  end
-
-  @doc """
-  Return a thunk that, when forced, evaluates the goal on the state.
-  """
-  def delay(state, goal) do
-    fn ->
-      goal.(state)
+    fn %S{} = state ->
+      state |> S.inc_count() |> var_to_goal.(V.new(state.count)).()
     end
   end
 
   @doc """
   Call a goal on an empty state and return the result as an Elixir Stream.
   """
-  def call_on_empty(goal), do: goal.(S.empty()) |> D.to_stream()
+  def call_on_empty(goal), do: S.empty() |> goal.() |> D.to_stream()
 end
