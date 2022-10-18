@@ -19,10 +19,7 @@ applications to software-based products. Because usage and extension of `Logos` 
 design considerations, the library is broken into modules that reflect the different 
 implementation concerns, including unification, a purely functional core reminiscent of 
 microKanren, and a collection of macros that make up the main user interface. It is hoped 
-that `Logos` can be applied, adapted, and grown with relative ease. Documentation for 
-each of the modules, functions, and macros is extensive, and includes many usage examples, 
-as well as notes on specific design choices and possible areas for future improvement 
-(**WIP note: This is not yet true, but it will be!**).
+that `Logos` can be applied, adapted, and grown with relative ease.
 
 ## A sample of references that influenced this work
 
