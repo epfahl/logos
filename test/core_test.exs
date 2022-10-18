@@ -82,4 +82,14 @@ defmodule CoreTest do
     result = ask([x], do: equal(x, [1, x])) |> Enum.to_list()
     assert result == []
   end
+
+  test "norvig occurs unification test" do
+    result =
+      ask [x, y] do
+        equal([1, x, y, 2], [1, y, x, x])
+      end
+      |> Enum.to_list()
+
+    assert result == [[2, 2]]
+  end
 end
