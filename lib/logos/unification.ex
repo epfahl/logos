@@ -13,9 +13,7 @@ defmodule Logos.Unification do
 
   ## Test `unify`
   - atom, variable, and list terms
-  - reflexivity, commutativity, transativity, associativity
-  - when `occurs?` violated
-  - Peter Norvig's test case (look it up)
+  - reflexivity, commutativity, transitivity, associativity
   """
 
   alias Logos.Variable, as: V
