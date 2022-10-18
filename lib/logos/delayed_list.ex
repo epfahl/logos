@@ -73,6 +73,5 @@ defmodule Logos.DelayedList do
 
   defp stream_next([]), do: {:halt, []}
   defp stream_next(dl) when is_promise(dl), do: {[], force(dl)}
-
   defp stream_next([h | t]), do: {[h], t}
 end
