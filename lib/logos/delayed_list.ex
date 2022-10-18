@@ -42,24 +42,6 @@ defmodule Logos.DelayedList do
   def flat_map(dl, mapper) when is_promise(dl), do: flat_map(force(dl), mapper) |> delay()
   def flat_map([], _mapper), do: []
 
-  # @doc """
-  # Advance the stream until it is a list, a "mature" stream in the language of miniKanren.
-  # """
-  # def advance(dl) when is_list(dl), do: dl
-  # def advance(dl) when is_promise(dl), do: dl |> force() |> advance()
-
-  # @doc """
-  # Return a list of the first `n` concrete elements.
-  # """
-  # def take(_dl, 0), do: []
-
-  # def take(dl, n) when is_integer(n) and n > 0 do
-  #   case advance(dl) do
-  #     [h | t] -> [h | take(t, n - 1)]
-  #     _ -> []
-  #   end
-  # end
-
   @doc """
   Convert a delayed list to an Elixir `Stream`.
   """
