@@ -17,7 +17,7 @@ defmodule Logos.CoreNonRel do
     end
   end
 
-  defp do_switch(_state, [_h | _t] = stream, g_conc, _g_else), do: D.bind(stream, g_conc)
+  defp do_switch(_state, [_h | _t] = stream, g_conc, _g_else), do: D.flat_map(stream, g_conc)
   defp do_switch(state, [], _g_conc, g_alt), do: g_alt.(state)
 
   defp do_switch(state, stream, g_conc, g_alt) when is_function(stream) do

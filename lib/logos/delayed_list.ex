@@ -24,7 +24,7 @@ defmodule Logos.DelayedList do
   @doc """
   Interleave a pair of delayed lists.
   """
-  def interleave([h1 | t1], dl2), do: [h1 | mplus(dl2, t1) |> delay()]
+  def interleave([h1 | t1], dl2), do: [h1 | interleave(dl2, t1) |> delay()]
   def interleave(dl1, dl2) when is_promise(dl1), do: interleave(dl2, force(dl1)) |> delay()
   def interleave([], dl2), do: dl2
 
