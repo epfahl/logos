@@ -114,6 +114,9 @@ defmodule Logos.CoreNonRel do
   """
   def count(term, result), do: nonrel_unlist(term, result, &length/1)
 
+  # NOTE: Should all of these walks be deep walks?
+  # See `project` in miniK
+
   # Abstracted implementation of non-relational binary conditional operations.
   defp nonrel_bincond(term1, term2, op) when is_function(op) do
     fn %S{} = state ->

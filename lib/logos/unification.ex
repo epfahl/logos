@@ -1,6 +1,19 @@
 defmodule Logos.Unification do
   @moduledoc """
   Defines `unify`, the core algorithm for manipulating bindings of logical variables.
+
+  ## Notes
+  - Even if only for documentation, it would be beneficial to have a `term` type, a union
+    of union of atomic value (number, string, atom), variable, and list of terms
+    (recursive).
+
+    @type logos_atom() :: number() | atom() | String.t() | []
+    @type logos_term() :: latom() | [latom()]
+
+
+  ## Test `unify`
+  - atom, variable, and list terms
+  - reflexivity, commutativity, transitivity, associativity
   """
 
   alias Logos.Variable, as: V
@@ -17,8 +30,8 @@ defmodule Logos.Unification do
   end
 
   defp do_unify(state, term1, term2) when term1 == term2, do: {:ok, state}
-  defp do_unify(state, %V{} = term1, term2), do: {:ok, S.put_sub(state, term1, term2)}
-  defp do_unify(state, term1, %V{} = term2), do: {:ok, S.put_sub(state, term2, term1)}
+  defp do_unify(state, %V{} = var, term), do: occurs_or_extend(state, var, term)
+  defp do_unify(state, term, %V{} = var), do: occurs_or_extend(state, var, term)
 
   defp do_unify(state, [h1 | t1], [h2 | t2]) do
     case unify(state, h1, h2) do
@@ -31,7 +44,7 @@ defmodule Logos.Unification do
 
   @doc """
   Determine if variable `var` occurs in `term`, which indicates a recursive
-  relationship--a cycle in the implied graph of associations.
+  a cycle in the implied graph of associations.
   """
   def occurs?(%S{} = state, %V{} = var, term) do
     term_walked = S.walk(state, term)
@@ -48,4 +61,12 @@ defmodule Logos.Unification do
   end
 
   defp do_occurs(_state, _key, _term), do: false
+
+  defp occurs_or_extend(state, var, term) do
+    if occurs?(state, var, term) do
+      :error
+    else
+      {:ok, S.extend(state, var, term)}
+    end
+  end
 end

@@ -26,8 +26,8 @@ defmodule Logos.Presentation do
   def create_var_sub(%S{} = state, term), do: do_create_var_sub(state, S.walk(state, term))
 
   defp do_create_var_sub(%S{count: c} = state, %V{} = v) do
-    rvar = present_var(c)
-    state = S.put_sub(state, v, rvar)
+    pvar = present_var(c)
+    state = S.extend(state, v, pvar)
     %{state | count: c + 1}
   end
 
