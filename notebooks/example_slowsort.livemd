@@ -1,0 +1,87 @@
+# Slowsort
+
+```elixir
+Mix.install([{:logos, git: "https://github.com/epfahl/logos.git"}])
+```
+
+## Section
+
+Notes:
+
+* It should be possible to infer the need and vars for `with_vars` based on vars
+  undeclared in current scope. It should be possible to do this in the macro...?
+* This is a good example of using relational reasoning. What is the relational description
+  of `delete`, for example? (... a description of the problem that can be directly executed...)
+* I love the idea of programming as the creation of a functional/executable description.
+
+```elixir
+defmodule Slowsort do
+  use Logos
+
+  defrule sort(l, sl) do
+    [sorted(sl), perm(l, sl)]
+  end
+
+  defrule sorted(l) do
+    equal(l, [])
+
+    with_vars [h, t] do
+      [equal([h | t], l), equal(t, [])]
+    end
+
+    with_vars [first, second, rest] do
+      [
+        equal(l, [first, second | rest]),
+        lte(first, second),
+        sorted([second | rest])
+      ]
+    end
+  end
+
+  # Their lengths should be the same, but I'm not sure how we talk about
+  # length without numbers. If one list is empty, and the other is not in the 
+  # base case, then they're not the same length, but this requires negation.
+  # What this is really saying is that have a set itersection, I think.
+  defrule perm(l1, l2) do
+    [equal(l1, []), equal(l2, [])]
+
+    with_vars [h1, t1, h2, t2, r1] do
+      [
+        equal([h1 | t1], l1),
+        equal([h2 | t2], l2),
+        delete(h2, l1, r1),
+        perm(r1, t2)
+      ]
+    end
+  end
+
+  defrule delete(x, l, r) do
+    [equal(l, []), equal(r, [])]
+
+    # [head(x, l), equal([x | r], l)]
+
+    equal([x | r], l)
+
+    with_vars [hl, tl, tr] do
+      [
+        equal([hl | tl], l),
+        equal([hl | tr], r),
+        delete(x, tl, tr)
+      ]
+    end
+  end
+end
+```
+
+```elixir
+use Logos
+
+ask [q] do
+  Slowsort.delete(2, [1, 2, 3], q)
+end
+|> Enum.take(10)
+```
+
+```elixir
+[2 | [1, 2, 3]]
+```

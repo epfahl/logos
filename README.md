@@ -1,5 +1,17 @@
 WARNING: This is very much a work in progress! Expect missing, incomplete, or inconsistent code, tests, and documentation. 
 
+# April 2023 update
+
+I've written two blog posts that dive into the foundations of syntactic unification and
+some of the microKanren primitives:
+
+[Unification in Elixir](https://www.ericpfahl.com/from-pattern-matching-to-unification/)
+
+[Beyond unification: A little logic language](https://www.ericpfahl.com/beyond-unification-a-basic-logical-toolkit/)
+
+The code developed in these posts and shared in gists is independent of `Logos`.
+
+
 # What is Logos?
 
 **Logos: The Greek root (λόγοϚ) of the word _logic_.**
