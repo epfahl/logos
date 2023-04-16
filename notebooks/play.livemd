@@ -1,0 +1,113 @@
+# play
+
+## New things to try
+
+### Delayed list as a separate library
+
+* continuable streams?
+  * Are they already continuable in the list form? [h | rest]
+* good func names--not `bind` and `mplus`
+* concurrent interleave
+* `Braid`: a library for working with multiple streams
+
+### Rules framework
+
+* embrace NR operators, at least until a generic constraint system is implemented
+  * grounded inputs
+  * no (or weak) generative capabilities
+  * (maybe) rule-order dependency (maybe not if fully grounded data)
+
+### Database and QL
+
+* EAV or more general relations?
+* mutable EAV or immutable EAVT?
+  * if a transaction scheme is introduced, EAVT is probably the way
+* NR operators
+* `find` macro with `where:`, like in Datomic and earlier attempt
+
+<!-- livebook:{"break_markdown":true} -->
+
+defcurried (func(arg) x) do
+  arg
+end
+
+```elixir
+defmodule Closure do
+  defmacro defclosure({name, _, args}, inner_arg, do: block) do
+    quote do
+      def unquote(name)(unquote_splicing(args)) do
+        fn unquote(inner_arg) ->
+          unquote(block)
+        end
+      end
+    end
+  end
+end
+```
+
+```elixir
+defmodule Test do
+  import Closure
+
+  defclosure adder(x, y), %{a: a} do
+    x + y + a
+  end
+end
+
+f = Test.adder(1, 2)
+
+f.(%{a: 4})
+```
+
+```elixir
+quote do
+  defcurried adder(x, y), z do
+    x + y
+  end
+end
+```
+
+```elixir
+defmodule Test do
+  import Curry
+
+  defcurried(adder(x), on: y, do: x + y)
+end
+```
+
+```elixir
+Test.adder(1).(2)
+```
+
+```elixir
+quote do
+  defcurried func(arg), on: x do
+    y = x + 1
+  end
+end
+```
+
+```elixir
+use Logos
+
+ask [x, y] do
+  [equal(x, 15), gt(x, 10), lt(x, 20), sum([x, 1], y)]
+end
+|> Enum.to_list()
+
+# this is unexpected behavior.
+# first conj returns []; second sees just empty
+# what should it return if first is "false"; what is the proper NR implementation?
+# should we just move forward and assume vars are grounded before applying NR ops?
+# this would be true for a query language...?
+
+# in a NR relation, a variable maybe shouldn't cause "failure" (and empty stream)
+# but it also can't just pass through the state, because it _could_ be false
+# this is why proper domain constraints are tricky; one has to hold the state _and_
+# the constraint, and then evaluate the constratin if/when the variable is grounded
+# but as long as the data _is_ grounded at time of evaluation, there's no problem
+```
+
+### Queries
+
+*
